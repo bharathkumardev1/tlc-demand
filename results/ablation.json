@@ -1,0 +1,171 @@
+{
+  "horizon_bins": 4,
+  "folds": 3,
+  "groups": {
+    "lags": [
+      "lag_0",
+      "lag_1",
+      "lag_2",
+      "lag_3",
+      "lag_4",
+      "lag_8",
+      "lag_16"
+    ],
+    "rolling_means": [
+      "roll_mean_4",
+      "roll_mean_16",
+      "roll_mean_96"
+    ],
+    "same_slot": [
+      "same_slot_1d",
+      "same_slot_1w"
+    ],
+    "calendar": [
+      "tod",
+      "dow",
+      "is_weekend",
+      "tod_sin",
+      "tod_cos"
+    ],
+    "zone": [
+      "zone"
+    ]
+  },
+  "runs": {
+    "full_seed0": {
+      "n_features": 18,
+      "dropped": [],
+      "seed": 0,
+      "wape_per_fold": [
+        0.23368,
+        0.23942,
+        0.25122
+      ],
+      "wape_mean": 0.24144,
+      "mae_mean": 1.03325,
+      "naive_wape_mean": 0.3104,
+      "seconds": 374
+    },
+    "full_seed1": {
+      "n_features": 18,
+      "dropped": [],
+      "seed": 1,
+      "wape_per_fold": [
+        0.23375,
+        0.23997,
+        0.25148
+      ],
+      "wape_mean": 0.24173,
+      "mae_mean": 1.0345,
+      "naive_wape_mean": 0.3104,
+      "seconds": 379
+    },
+    "full_seed2": {
+      "n_features": 18,
+      "dropped": [],
+      "seed": 2,
+      "wape_per_fold": [
+        0.23441,
+        0.23936,
+        0.25155
+      ],
+      "wape_mean": 0.24177,
+      "mae_mean": 1.03473,
+      "naive_wape_mean": 0.3104,
+      "seconds": 380
+    },
+    "minus_lags": {
+      "n_features": 11,
+      "dropped": [
+        "lag_0",
+        "lag_1",
+        "lag_2",
+        "lag_3",
+        "lag_4",
+        "lag_8",
+        "lag_16"
+      ],
+      "seed": 0,
+      "wape_per_fold": [
+        0.23403,
+        0.24007,
+        0.25235
+      ],
+      "wape_mean": 0.24215,
+      "mae_mean": 1.03624,
+      "naive_wape_mean": 0.3104,
+      "seconds": 322
+    },
+    "minus_rolling_means": {
+      "n_features": 15,
+      "dropped": [
+        "roll_mean_4",
+        "roll_mean_16",
+        "roll_mean_96"
+      ],
+      "seed": 0,
+      "wape_per_fold": [
+        0.23475,
+        0.24218,
+        0.25288
+      ],
+      "wape_mean": 0.24327,
+      "mae_mean": 1.04103,
+      "naive_wape_mean": 0.3104,
+      "seconds": 346
+    },
+    "minus_same_slot": {
+      "n_features": 16,
+      "dropped": [
+        "same_slot_1d",
+        "same_slot_1w"
+      ],
+      "seed": 0,
+      "wape_per_fold": [
+        0.2425,
+        0.24691,
+        0.25262
+      ],
+      "wape_mean": 0.24734,
+      "mae_mean": 1.05905,
+      "naive_wape_mean": 0.3104,
+      "seconds": 336
+    },
+    "minus_calendar": {
+      "n_features": 13,
+      "dropped": [
+        "tod",
+        "dow",
+        "is_weekend",
+        "tod_sin",
+        "tod_cos"
+      ],
+      "seed": 0,
+      "wape_per_fold": [
+        0.24253,
+        0.24815,
+        0.26156
+      ],
+      "wape_mean": 0.25075,
+      "mae_mean": 1.07305,
+      "naive_wape_mean": 0.3104,
+      "seconds": 391
+    },
+    "minus_zone": {
+      "n_features": 17,
+      "dropped": [
+        "zone"
+      ],
+      "seed": 0,
+      "wape_per_fold": [
+        0.23889,
+        0.24348,
+        0.25574
+      ],
+      "wape_mean": 0.24604,
+      "mae_mean": 1.05301,
+      "naive_wape_mean": 0.3104,
+      "seconds": 405
+    }
+  }
+}
