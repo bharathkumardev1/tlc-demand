@@ -1,0 +1,20 @@
+[project]
+name = "tlc-demand"
+version = "0.1.0"
+description = "Zone-level 15-minute taxi demand forecasting with leakage-safe features and a rolling-origin backtest."
+requires-python = ">=3.11"
+dependencies = [
+  "numpy>=2.0",
+  "pandas>=2.2",
+  "pyarrow>=17",
+  "lightgbm>=4.5",
+]
+
+[project.optional-dependencies]
+dev = ["pytest>=8"]
+
+[tool.setuptools.packages.find]
+where = ["src"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
