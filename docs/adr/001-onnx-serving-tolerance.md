@@ -12,7 +12,9 @@ The gateway calls a FastAPI service that runs the LightGBM model exported to ONN
 - Rounding inputs to float32 and feeding LightGBM directly shifts predictions by up to 2.086, so most of the tail comes from thresholds close to a feature value, not from the ONNX runtime.
 
 ## Decision
-Service tests assert aggregate parity (WAPE within 0.001) and a per-row bound at the 99th percentile (0.1 trips), not elementwise equality. A few rows differ by more than 2 trips and that is expected, not a bug.
+Parity should be asserted in aggregate (WAPE within 0.001) and by a per-row bound at the 99th percentile (0.1 trips), not by elementwise equality. A few rows differ by more than 2 trips and that is expected.
+
+Not done yet: tests/test_service.py does not assert these bounds. Only scripts/check_onnx_parity.py measures them. Adding the assertions is an open item.
 
 ## Consequences
 Anyone changing the feature set must rerun scripts/check_onnx_parity.py and update these numbers.
