@@ -1,0 +1,166 @@
+{
+  "horizon_bins": 4,
+  "test_folds": [
+    "2023-06-10 00:00:00",
+    "2023-06-17 00:00:00",
+    "2023-06-24 00:00:00"
+  ],
+  "weights_from": "forecast errors on earlier folds only",
+  "boroughs": [
+    "Bronx",
+    "Brooklyn",
+    "EWR",
+    "Manhattan",
+    "N/A",
+    "Queens",
+    "Staten Island",
+    "Unknown"
+  ],
+  "n_zones": 262,
+  "pooled_wape": {
+    "base": {
+      "city": 0.05934,
+      "borough": 0.08059,
+      "zone": 0.24117
+    },
+    "naive": {
+      "city": 0.10307,
+      "borough": 0.12848,
+      "zone": 0.30961
+    },
+    "bottom_up": {
+      "city": 0.06585,
+      "borough": 0.08694,
+      "zone": 0.24117
+    },
+    "ols": {
+      "city": 0.05912,
+      "borough": 0.08354,
+      "zone": 0.24486
+    },
+    "wls_variance": {
+      "city": 0.06225,
+      "borough": 0.08254,
+      "zone": 0.23942
+    },
+    "mint_shrink": {
+      "city": 0.06004,
+      "borough": 0.07994,
+      "zone": 0.23842
+    }
+  },
+  "per_fold_wape": {
+    "2023-06-10 00:00:00": {
+      "base": {
+        "city": 0.05461,
+        "borough": 0.07443,
+        "zone": 0.23364
+      },
+      "naive": {
+        "city": 0.08072,
+        "borough": 0.1053,
+        "zone": 0.28428
+      },
+      "bottom_up": {
+        "city": 0.05901,
+        "borough": 0.08145,
+        "zone": 0.23364
+      },
+      "ols": {
+        "city": 0.05416,
+        "borough": 0.07767,
+        "zone": 0.23816
+      },
+      "wls_variance": {
+        "city": 0.056,
+        "borough": 0.07732,
+        "zone": 0.23221
+      },
+      "mint_shrink": {
+        "city": 0.05448,
+        "borough": 0.07505,
+        "zone": 0.23147
+      }
+    },
+    "2023-06-17 00:00:00": {
+      "base": {
+        "city": 0.05458,
+        "borough": 0.07779,
+        "zone": 0.23973
+      },
+      "naive": {
+        "city": 0.10796,
+        "borough": 0.1369,
+        "zone": 0.31822
+      },
+      "bottom_up": {
+        "city": 0.06089,
+        "borough": 0.08238,
+        "zone": 0.23973
+      },
+      "ols": {
+        "city": 0.0545,
+        "borough": 0.08021,
+        "zone": 0.24304
+      },
+      "wls_variance": {
+        "city": 0.0575,
+        "borough": 0.07833,
+        "zone": 0.23799
+      },
+      "mint_shrink": {
+        "city": 0.05534,
+        "borough": 0.07599,
+        "zone": 0.23699
+      }
+    },
+    "2023-06-24 00:00:00": {
+      "base": {
+        "city": 0.0695,
+        "borough": 0.09031,
+        "zone": 0.25101
+      },
+      "naive": {
+        "city": 0.12276,
+        "borough": 0.14541,
+        "zone": 0.32872
+      },
+      "bottom_up": {
+        "city": 0.07855,
+        "borough": 0.09774,
+        "zone": 0.25101
+      },
+      "ols": {
+        "city": 0.06939,
+        "borough": 0.09349,
+        "zone": 0.25414
+      },
+      "wls_variance": {
+        "city": 0.07409,
+        "borough": 0.09269,
+        "zone": 0.24889
+      },
+      "mint_shrink": {
+        "city": 0.07105,
+        "borough": 0.08945,
+        "zone": 0.24759
+      }
+    }
+  },
+  "shrinkage": {
+    "2023-06-10 00:00:00": {
+      "mint_shrink_intensity": 0.35780825316093584,
+      "residual_rows": 672
+    },
+    "2023-06-17 00:00:00": {
+      "mint_shrink_intensity": 0.29296922170573453,
+      "residual_rows": 1344
+    },
+    "2023-06-24 00:00:00": {
+      "mint_shrink_intensity": 0.2795812493839674,
+      "residual_rows": 2016
+    }
+  },
+  "negative_values_clipped_to_zero": "after reconciliation",
+  "seconds": 775
+}
