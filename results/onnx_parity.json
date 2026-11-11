@@ -1,0 +1,18 @@
+{
+  "rows": 173376,
+  "abs_diff_quantiles_50_99_999_max": [
+    0.0,
+    0.04292,
+    0.45905,
+    2.31086
+  ],
+  "rel_diff_quantiles_99_999_max": [
+    0.00961,
+    0.05232,
+    0.17484
+  ],
+  "rows_abs_diff_over_0.01": 3540,
+  "lightgbm_float64_vs_float32_rounded_inputs_max_abs": 2.08635,
+  "wape_lightgbm": 0.25483,
+  "wape_onnx": 0.25484
+}

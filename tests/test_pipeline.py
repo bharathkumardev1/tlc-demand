@@ -100,3 +100,23 @@ def test_slices_cover_every_row_once(panel):
     for t in tables.values():
         assert t["n"].sum() == ok
         assert abs(t["share_of_trips"].sum() - 1) < 1e-9
+
+
+def test_online_features_match_batch_features(panel):
+    from tlc_demand.online import MIN_HISTORY, features_at_origin
+
+    batch = make_features(panel, H)
+    zone = 20
+    g = panel[panel["zone"] == zone].reset_index(drop=True)
+    rows = batch[batch["zone"] == zone].sample(25, random_state=0)
+    checked = 0
+    for _, row in rows.iterrows():
+        pos = g.index[g["bin"] == row["origin"]][0]
+        if pos + 1 < MIN_HISTORY:
+            continue
+        hist = g["y"].to_numpy()[pos + 1 - MIN_HISTORY : pos + 1]
+        got = features_at_origin(hist, row["origin"], zone, H)
+        for col, val in got.items():
+            assert val == pytest.approx(row[col]), col
+        checked += 1
+    assert checked >= 10
