@@ -6,3 +6,4 @@ data/
 mlruns/
 *.parquet
 artifacts/
+gateway/target/

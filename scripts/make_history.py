@@ -18,4 +18,9 @@ panel = build_panel(load(raw, year, month, month), f"{year}-{month:02d}-01", end
 last = panel["bin"].max()
 arrays = {f"zone_{z}": g.sort_values("bin")["y"].to_numpy(np.int32)[-MIN_HISTORY:] for z, g in panel.groupby("zone")}
 np.savez_compressed(out, last_origin=str(last), **arrays)
+# seasonal-naive value for the next target bin, for the gateway's fallback path
+HORIZON = 4
+from tlc_demand.panel import BINS_PER_WEEK  # noqa: E402
+fallback = {z: int(a[-1 - (BINS_PER_WEEK - HORIZON)]) for z, a in ((int(k[5:]), v) for k, v in arrays.items())}
+out.with_name("fallback.csv").write_text("zone,trips\n" + "".join(f"{z},{v}\n" for z, v in sorted(fallback.items())))
 print(f"{len(arrays)} zones, last origin {last}")
