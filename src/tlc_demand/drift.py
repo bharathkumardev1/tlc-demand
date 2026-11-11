@@ -72,8 +72,13 @@ class Reference:
         return ref
 
     def expected_count(self, zone, tod, dow) -> np.ndarray:
-        keys = slot_key(zone, dow, np.asarray(tod) // 4)
-        return np.array([self.slot_mean.get(int(k), np.nan) for k in keys])
+        if not hasattr(self, "_lookup"):
+            ks = np.array(sorted(self.slot_mean))
+            self._lookup = (ks, np.array([self.slot_mean[int(k)] for k in ks]))
+        ks, vs = self._lookup
+        keys = np.asarray(slot_key(zone, dow, np.asarray(tod) // 4))
+        pos = np.clip(np.searchsorted(ks, keys), 0, len(ks) - 1)
+        return np.where(ks[pos] == keys, vs[pos], np.nan)
 
     def tiers(self, zone, tod, dow) -> np.ndarray:
         m = self.expected_count(zone, tod, dow)
@@ -84,15 +89,21 @@ class Reference:
     def relative(self, zone: np.ndarray, tod: np.ndarray, dow: np.ndarray, value: np.ndarray) -> np.ndarray:
         return np.asarray(value, float) / (self.expected_count(zone, tod, dow) + 1.0)
 
-    def score(self, zone: np.ndarray, tod: np.ndarray, dow: np.ndarray, values: dict[str, np.ndarray]) -> dict[str, float]:
-        """PSI per feature, computed inside each zone-volume tier and averaged with weights equal to the
-        tier's share of the window. Which zones were asked about changes the weights, not the
-        reference distribution each tier is compared with."""
+    def prepare(self, zone, tod, dow, values: dict[str, np.ndarray]) -> tuple[np.ndarray, dict[str, np.ndarray]]:
+        """Tier and relative value of every row. Split out so long histories can be prepared once and scored in windows."""
         zone = np.asarray(zone)
-        tier = self.tiers(zone, tod, dow)
+        return self.tiers(zone, tod, dow), {n: self.relative(zone, tod, dow, values[n]) for n in MONITORED}
+
+    def score(self, zone: np.ndarray, tod: np.ndarray, dow: np.ndarray, values: dict[str, np.ndarray]) -> dict[str, float]:
+        return self.score_prepared(*self.prepare(zone, tod, dow, values))
+
+    def score_prepared(self, tier: np.ndarray, rel_by_feature: dict[str, np.ndarray]) -> dict[str, float]:
+        """PSI per feature, computed inside each tier of expected count and averaged with weights equal to the
+        tier's share of the window. Which zones or hours were asked about changes the weights, not the
+        reference distribution each tier is compared with."""
         out = {}
         for name in MONITORED:
-            rel = self.relative(zone, tod, dow, values[name])
+            rel = rel_by_feature[name]
             num = den = 0.0
             for t in range(len(self.tier_cuts) + 1):
                 r = rel[(tier == t) & ~np.isnan(rel)]

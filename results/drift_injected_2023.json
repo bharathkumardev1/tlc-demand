@@ -1,0 +1,147 @@
+{
+  "reference": "2023-01-08 to 2023-01-31",
+  "calibration_period": "2023-02-01 to 2023-03-31 (hourly windows)",
+  "threshold_is_max_psi_in_calibration": {
+    "24": 0.13475285284800137,
+    "6": 0.7961481144548209
+  },
+  "calibration": {
+    "24": {
+      "n_windows": 1392,
+      "max": 0.13475,
+      "p99": 0.12129,
+      "median": 0.04769
+    },
+    "6": {
+      "n_windows": 1410,
+      "max": 0.79615,
+      "p99": 0.69436,
+      "median": 0.37805
+    }
+  },
+  "false_alarms_clean_2023-04-01_to_2023-06-14": {
+    "24": {
+      "evaluations": 1776,
+      "alerts": 36,
+      "days_with_alerts": [
+        "2023-04-14",
+        "2023-04-15",
+        "2023-04-24",
+        "2023-05-07",
+        "2023-05-08",
+        "2023-05-13",
+        "2023-05-14",
+        "2023-05-15"
+      ],
+      "max": 0.16896
+    },
+    "6": {
+      "evaluations": 1794,
+      "alerts": 7,
+      "days_with_alerts": [
+        "2023-04-11",
+        "2023-05-10",
+        "2023-05-16",
+        "2023-05-29",
+        "2023-06-07",
+        "2023-06-13",
+        "2023-06-14"
+      ],
+      "max": 0.89434
+    }
+  },
+  "injection_time": "2023-06-15 00:00:00",
+  "zones_x2_group": [
+    13,
+    24,
+    43,
+    70,
+    79,
+    88,
+    125,
+    140,
+    141,
+    151,
+    158,
+    163,
+    170,
+    186,
+    231,
+    236,
+    239,
+    246,
+    261,
+    263
+  ],
+  "scenarios": {
+    "control": {
+      "24": {
+        "alerts_before_injection_jun8_to_jun15": 0,
+        "first_alert_after_injection": "2023-06-16 18:00:00",
+        "detection_delay_hours": 42.0,
+        "share_of_post_injection_windows_alerting": 0.0052,
+        "max_psi_after_injection": 0.13641
+      },
+      "6": {
+        "alerts_before_injection_jun8_to_jun15": 2,
+        "first_alert_after_injection": null,
+        "detection_delay_hours": null,
+        "share_of_post_injection_windows_alerting": 0.0,
+        "max_psi_after_injection": 0.78579
+      }
+    },
+    "zones_x2": {
+      "24": {
+        "alerts_before_injection_jun8_to_jun15": 0,
+        "first_alert_after_injection": "2023-06-16 07:00:00",
+        "detection_delay_hours": 31.0,
+        "share_of_post_injection_windows_alerting": 0.1667,
+        "max_psi_after_injection": 0.16674
+      },
+      "6": {
+        "alerts_before_injection_jun8_to_jun15": 2,
+        "first_alert_after_injection": "2023-06-27 05:00:00",
+        "detection_delay_hours": 293.0,
+        "share_of_post_injection_windows_alerting": 0.0026,
+        "max_psi_after_injection": 0.81137
+      }
+    },
+    "all_x1.3": {
+      "24": {
+        "alerts_before_injection_jun8_to_jun15": 0,
+        "first_alert_after_injection": "2023-06-15 22:00:00",
+        "detection_delay_hours": 22.0,
+        "share_of_post_injection_windows_alerting": 0.5521,
+        "max_psi_after_injection": 0.26272
+      },
+      "6": {
+        "alerts_before_injection_jun8_to_jun15": 2,
+        "first_alert_after_injection": "2023-06-16 05:00:00",
+        "detection_delay_hours": 29.0,
+        "share_of_post_injection_windows_alerting": 0.0156,
+        "max_psi_after_injection": 0.86722
+      }
+    },
+    "clock_shift_1h": {
+      "24": {
+        "alerts_before_injection_jun8_to_jun15": 0,
+        "first_alert_after_injection": null,
+        "detection_delay_hours": null,
+        "share_of_post_injection_windows_alerting": 0.0,
+        "max_psi_after_injection": 0.13327
+      },
+      "6": {
+        "alerts_before_injection_jun8_to_jun15": 2,
+        "first_alert_after_injection": "2023-06-19 12:00:00",
+        "detection_delay_hours": 108.0,
+        "share_of_post_injection_windows_alerting": 0.0026,
+        "max_psi_after_injection": 0.8636
+      }
+    }
+  },
+  "windows_hours": [
+    24,
+    6
+  ],
+  "seconds": 88
+}
