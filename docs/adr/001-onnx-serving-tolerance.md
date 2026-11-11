@@ -14,7 +14,7 @@ The gateway calls a FastAPI service that runs the LightGBM model exported to ONN
 ## Decision
 Parity should be asserted in aggregate (WAPE within 0.001) and by a per-row bound at the 99th percentile (0.1 trips), not by elementwise equality. A few rows differ by more than 2 trips and that is expected.
 
-Not done yet: tests/test_service.py does not assert these bounds. Only scripts/check_onnx_parity.py measures them. Adding the assertions is an open item.
+tests/test_service.py asserts both bounds on a small synthetic model (99th percentile under 0.1 trips, summed absolute difference under 0.1% of summed predictions). scripts/check_onnx_parity.py measures the same quantities on the real June 2023 features and writes results/onnx_parity.json. The test bound on summed difference is on predictions, not on WAPE against actuals; the WAPE agreement above is the real-data check.
 
 ## Consequences
 Anyone changing the feature set must rerun scripts/check_onnx_parity.py and update these numbers.

@@ -55,3 +55,22 @@ def test_metrics_expose_requests_and_latency(setup):
     text = client.get("/metrics").text
     assert 'forecast_requests_total{outcome="ok"}' in text
     assert "forecast_latency_seconds_bucket" in text and "history_snapshot_age_seconds" in text
+
+
+def test_onnx_agrees_with_lightgbm_in_aggregate_and_at_p99(tmp_path):
+    """Bounds from docs/adr/001: float32 trees are not bit-identical, so compare distributions, not rows."""
+    import onnxruntime as ort
+
+    panel = build_panel(synthetic_trips(days=21), "2023-01-02", "2023-01-23")
+    feats = make_features(panel, H)
+    X = feats[FEATURE_COLUMNS]
+    model = lgb.train({"objective": "poisson", "verbose": -1, "num_leaves": 7, "seed": 0, "deterministic": True,
+                       "num_threads": 1}, lgb.Dataset(X, feats["y"]), 30)
+    onx = convert_lightgbm(model, initial_types=[("features", FloatTensorType([None, len(FEATURE_COLUMNS)]))],
+                           target_opset=15)
+    sess = ort.InferenceSession(onx.SerializeToString(), providers=["CPUExecutionProvider"])
+    ref = model.predict(X.to_numpy(np.float64))
+    got = sess.run(None, {"features": X.to_numpy(np.float32)})[0].ravel()
+    diff = np.abs(ref - got)
+    assert np.quantile(diff, 0.99) < 0.1
+    assert diff.sum() / max(ref.sum(), 1.0) < 0.001
