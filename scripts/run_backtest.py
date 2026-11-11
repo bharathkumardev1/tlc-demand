@@ -11,6 +11,7 @@ import pyarrow.parquet as pq
 from tlc_demand.backtest import run_backtest
 from tlc_demand.features import make_features
 from tlc_demand.panel import build_panel
+from tlc_demand.slices import slice_table
 from tlc_demand.schema import PICKUP_COLUMNS, ZONE_COLUMN, validate_trips
 
 
@@ -45,7 +46,10 @@ if __name__ == "__main__":
     panel = build_panel(trips, f"{a.year}-{a.m0:02d}-01", end)
     feats = make_features(panel, a.horizon)
     print(f"panel {len(panel):,} rows, features {len(feats):,} rows, zones {panel.zone.nunique()}", flush=True)
-    res = run_backtest(feats, a.horizon, test_days=7, n_folds=a.folds, seed=a.seed)
+    collected = []
+    res = run_backtest(feats, a.horizon, test_days=7, n_folds=a.folds, seed=a.seed, collect=collected)
+    slices = {k: v.round(4).reset_index().to_dict(orient='records')
+              for k, v in slice_table(pd.concat(collected)).items()}
     rows = [
         {"test_start": str(r.test_start), "n_test": r.n_test, "wape_model": r.wape_model,
          "wape_naive": r.wape_naive, "mae_model": r.mae_model, "mae_naive": r.mae_naive}
@@ -53,5 +57,5 @@ if __name__ == "__main__":
     ]
     for r in rows:
         print(r, flush=True)
-    a.out.write_text(json.dumps({"horizon_bins": a.horizon, "seed": a.seed, "folds": rows,
+    a.out.write_text(json.dumps({"horizon_bins": a.horizon, "seed": a.seed, "folds": rows, "slices": slices,
                                  "seconds": round(time.time() - t0)}, indent=2))

@@ -40,6 +40,7 @@ def run_backtest(
     n_folds: int = 3,
     seed: int = 0,
     params: dict | None = None,
+    collect: list | None = None,
 ) -> list[FoldResult]:
     p = {
         "objective": "poisson",
@@ -71,6 +72,10 @@ def run_backtest(
         naive = seasonal_naive(test)
         ok = ~np.isnan(naive)
         y = test["y"].to_numpy()
+        if collect is not None:
+            collect.append(test.assign(pred=pred, naive=naive, fold=str(start))[
+                ["zone", "target_bin", "tod", "y", "pred", "naive", "fold"]
+            ])
         results.append(
             FoldResult(
                 test_start=start,

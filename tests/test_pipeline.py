@@ -85,3 +85,18 @@ def test_backtest_is_deterministic_and_has_no_train_test_overlap(panel):
     r2 = run_backtest(f, H, test_days=7, n_folds=2, seed=3)
     assert [x.wape_model for x in r1] == [x.wape_model for x in r2]
     assert len(r1) == 2 and all(x.n_test > 0 for x in r1)
+
+
+def test_slices_cover_every_row_once(panel):
+    from tlc_demand.slices import slice_table
+
+    f = make_features(panel, H)
+    f = f[f["target_bin"] >= "2023-01-30"]
+    pred = f.assign(pred=f["lag_0"], naive=f["same_slot_1w"])[
+        ["zone", "target_bin", "tod", "y", "pred", "naive"]
+    ]
+    tables = slice_table(pred)
+    ok = pred["naive"].notna().sum()
+    for t in tables.values():
+        assert t["n"].sum() == ok
+        assert abs(t["share_of_trips"].sum() - 1) < 1e-9
