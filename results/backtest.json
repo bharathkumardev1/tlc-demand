@@ -27,5 +27,90 @@
       "mae_naive": 1.344584923664122
     }
   ],
-  "seconds": 313
+  "slices": {
+    "volume_tier": [
+      {
+        "volume_tier": "q1_lowest",
+        "n": 133056.0,
+        "share_of_trips": 0.0005,
+        "wape_model": 2.4889,
+        "wape_naive": 1.9718
+      },
+      {
+        "volume_tier": "q2",
+        "n": 131040.0,
+        "share_of_trips": 0.0023,
+        "wape_model": 1.9603,
+        "wape_naive": 1.8714
+      },
+      {
+        "volume_tier": "q3",
+        "n": 131040.0,
+        "share_of_trips": 0.0124,
+        "wape_model": 1.3852,
+        "wape_naive": 1.4423
+      },
+      {
+        "volume_tier": "q4_highest",
+        "n": 133056.0,
+        "share_of_trips": 0.9847,
+        "wape_model": 0.2215,
+        "wape_naive": 0.2907
+      }
+    ],
+    "part_of_day": [
+      {
+        "part_of_day": "00-05",
+        "n": 132048.0,
+        "share_of_trips": 0.0901,
+        "wape_model": 0.3657,
+        "wape_naive": 0.4475
+      },
+      {
+        "part_of_day": "06-09",
+        "n": 88032.0,
+        "share_of_trips": 0.1193,
+        "wape_model": 0.2905,
+        "wape_naive": 0.3626
+      },
+      {
+        "part_of_day": "10-15",
+        "n": 132048.0,
+        "share_of_trips": 0.3272,
+        "wape_model": 0.2131,
+        "wape_naive": 0.2776
+      },
+      {
+        "part_of_day": "16-19",
+        "n": 88032.0,
+        "share_of_trips": 0.2539,
+        "wape_model": 0.2079,
+        "wape_naive": 0.2735
+      },
+      {
+        "part_of_day": "20-23",
+        "n": 88032.0,
+        "share_of_trips": 0.2095,
+        "wape_model": 0.2438,
+        "wape_naive": 0.3139
+      }
+    ],
+    "weekend": [
+      {
+        "weekend": "weekday",
+        "n": 377280.0,
+        "share_of_trips": 0.7294,
+        "wape_model": 0.2373,
+        "wape_naive": 0.3067
+      },
+      {
+        "weekend": "weekend",
+        "n": 150912.0,
+        "share_of_trips": 0.2706,
+        "wape_model": 0.2517,
+        "wape_naive": 0.3176
+      }
+    ]
+  },
+  "seconds": 307
 }
