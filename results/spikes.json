@@ -1,0 +1,77 @@
+{
+  "definition": "y > 0.9 quantile of the zone's training counts in the same weekday and hour, and y >= 5",
+  "horizon_bins": 4,
+  "per_fold": {
+    "2023-06-10 00:00:00": {
+      "n_test": 176064,
+      "n_spikes": 4740,
+      "base_rate": 0.02692,
+      "train_base_rate": 0.01765,
+      "rows_dropped_unseen_slot": 0,
+      "ap_classifier": 0.27347,
+      "ap_regression_ratio": 0.24262,
+      "ap_same_slot_1w_ratio": 0.13016,
+      "ap_lag0_ratio": 0.14313
+    },
+    "2023-06-17 00:00:00": {
+      "n_test": 176064,
+      "n_spikes": 3208,
+      "base_rate": 0.01822,
+      "train_base_rate": 0.01728,
+      "rows_dropped_unseen_slot": 0,
+      "ap_classifier": 0.20883,
+      "ap_regression_ratio": 0.18779,
+      "ap_same_slot_1w_ratio": 0.08172,
+      "ap_lag0_ratio": 0.10875
+    },
+    "2023-06-24 00:00:00": {
+      "n_test": 176064,
+      "n_spikes": 2860,
+      "base_rate": 0.01624,
+      "train_base_rate": 0.01662,
+      "rows_dropped_unseen_slot": 0,
+      "ap_classifier": 0.21913,
+      "ap_regression_ratio": 0.19901,
+      "ap_same_slot_1w_ratio": 0.07431,
+      "ap_lag0_ratio": 0.10584
+    }
+  },
+  "pooled": {
+    "base_rate": 0.02046,
+    "n_test": 528192,
+    "n_spikes": 10808,
+    "classifier": {
+      "ap": 0.23935,
+      "ci95_day_bootstrap": [
+        0.21003,
+        0.26553
+      ],
+      "lift_over_base_rate": 11.7
+    },
+    "regression_ratio": {
+      "ap": 0.21334,
+      "ci95_day_bootstrap": [
+        0.18515,
+        0.23772
+      ],
+      "lift_over_base_rate": 10.43
+    },
+    "same_slot_1w_ratio": {
+      "ap": 0.09595,
+      "ci95_day_bootstrap": [
+        0.08132,
+        0.11111
+      ],
+      "lift_over_base_rate": 4.69
+    },
+    "lag0_ratio": {
+      "ap": 0.12033,
+      "ci95_day_bootstrap": [
+        0.1034,
+        0.1369
+      ],
+      "lift_over_base_rate": 5.88
+    }
+  },
+  "seconds": 584
+}
