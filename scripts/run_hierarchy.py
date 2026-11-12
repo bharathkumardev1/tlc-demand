@@ -82,6 +82,10 @@ def wape(y, p):
 methods = ["base", "naive", "bottom_up", "ols", "wls_variance", "mint_shrink"]
 acc = {m: {lv: [0.0, 0.0] for lv in levels} for m in methods}  # abs error sum, actual sum
 per_fold, lams = {}, {}
+# gap between the city forecast and the sum of its zone forecasts, as a share of the city forecast,
+# before and after the zero clip: abs gap sum, city forecast sum
+gap = {m: {"before_clip": [0.0, 0.0], "after_clip": [0.0, 0.0]} for m in methods}
+gap_borough = {m: {"before_clip": [0.0, 0.0], "after_clip": [0.0, 0.0]} for m in methods}
 for k in range(1, len(folds)):
     P, Y, N = fold_mats(folds[k])
     E = np.vstack([fold_mats(f)[1] - fold_mats(f)[0] for f in folds[:k]])  # errors of earlier folds only
@@ -92,7 +96,14 @@ for k in range(1, len(folds)):
            "ols": reconcile(P, S), "wls_variance": reconcile(P, S, W_var), "mint_shrink": reconcile(P, S, W_mint)}
     per_fold[folds[k]] = {}
     for m, M in out.items():
+        raw = M
         M = np.clip(M, 0, None) if m not in ("base", "naive") else M
+        for tag, X in (("before_clip", raw), ("after_clip", M)):
+            c = X[:, levels["city"]].sum(axis=1)
+            gap[m][tag][0] += np.abs(X[:, levels["zone"]].sum(axis=1) - c).sum()
+            gap[m][tag][1] += np.abs(c).sum()
+            gap_borough[m][tag][0] += np.abs(X[:, levels["borough"]].sum(axis=1) - c).sum()
+            gap_borough[m][tag][1] += np.abs(c).sum()
         per_fold[folds[k]][m] = {}
         for lv, sl in levels.items():
             e, a = np.abs(Y[:, sl] - M[:, sl]).sum(), np.abs(Y[:, sl]).sum()
@@ -103,5 +114,8 @@ res = {m: {lv: round(v[0] / v[1], 5) for lv, v in d.items()} for m, d in acc.ite
 Path("results/hierarchy.json").write_text(json.dumps({
     "horizon_bins": H, "test_folds": folds[1:], "weights_from": "forecast errors on earlier folds only",
     "boroughs": names, "n_zones": len(zones), "pooled_wape": res, "per_fold_wape": per_fold, "shrinkage": lams,
-    "negative_values_clipped_to_zero": "after reconciliation", "seconds": round(time.time() - t0)}, indent=2))
+    "negative_values_clipped_to_zero": "after reconciliation",
+    "incoherence_share_of_city_forecast": {
+        "zones_sum_vs_city": {m: {t: round(v[0] / v[1], 6) for t, v in d.items()} for m, d in gap.items()},
+        "boroughs_sum_vs_city": {m: {t: round(v[0] / v[1], 6) for t, v in d.items()} for m, d in gap_borough.items()}}, "seconds": round(time.time() - t0)}, indent=2))
 print(json.dumps(res, indent=1))

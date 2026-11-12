@@ -26,7 +26,7 @@ My first ablation silently did nothing. I passed LightGBM an `ignore_column` set
 
 ## Reconciliation
 
-I trained separate models for zone, borough and city and reconciled them so children sum to parents. Shrunk MinT improved zone WAPE from 0.2412 to 0.2384 and borough from 0.0806 to 0.0799, and worsened the city from 0.0593 to 0.0600. With three folds and no interval, I read this as coherence at no measurable cost. Summing zone forecasts is plainly worse than modelling the city directly (0.0659 against 0.0593), which is the more useful finding.
+I trained separate models for zone, borough and city and reconciled them so children sum to parents (a final clip at zero leaves a gap of 0.003% of the city total for the MinT version). Shrunk MinT improved zone WAPE from 0.2412 to 0.2384 and borough from 0.0806 to 0.0799, and worsened the city from 0.0593 to 0.0600. With three folds and no interval, I read this as coherence at no measurable cost. Summing zone forecasts is plainly worse than modelling the city directly (0.0659 against 0.0593), which is the more useful finding.
 
 ## What I would do next
 

@@ -97,7 +97,7 @@ One model per level, then reconciled so that zone forecasts sum to the borough a
 | MinT, shrunk covariance | 0.23842 | 0.07994 | 0.06004 |
 <!-- /table:hierarchy -->
 
-Shrunk MinT lowers zone WAPE by 0.0028 and borough WAPE by 0.0007, and raises city WAPE by 0.0007. Three folds and no interval, so I read it as a coherence guarantee (children sum to parents) that costs nothing measurable, and I make no accuracy claim. Summing zone forecasts is clearly worse than a city model: 0.0659 against 0.0593. These pooled WAPEs differ slightly from the fold average above because pooling weights folds by volume. (ADR 003.)
+Shrunk MinT lowers zone WAPE by 0.0028 and borough WAPE by 0.0007, and raises city WAPE by 0.0007. I read it as a coherence step that costs nothing measurable and make no accuracy claim from it. Children sum to parents exactly before the zero clip. The clip then reopens a small gap: over the three folds, zone forecasts differ from the city forecast by 0.0028% of the city total for shrunk MinT (0.0014% for the variance-weighted version, 0.76% for OLS), against 3.2% for the independent forecasts, and the borough sums match to six decimals for MinT. Those figures are in `results/hierarchy.json`. Summing zone forecasts is clearly worse than a city model: 0.0659 against 0.0593. These pooled WAPEs differ slightly from the fold average above because pooling weights folds by volume. (ADR 003.)
 
 ### Spikes
 

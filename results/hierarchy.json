@@ -162,5 +162,59 @@
     }
   },
   "negative_values_clipped_to_zero": "after reconciliation",
-  "seconds": 775
+  "incoherence_share_of_city_forecast": {
+    "zones_sum_vs_city": {
+      "base": {
+        "before_clip": 0.031732,
+        "after_clip": 0.031732
+      },
+      "naive": {
+        "before_clip": 0.0,
+        "after_clip": 0.0
+      },
+      "bottom_up": {
+        "before_clip": 0.0,
+        "after_clip": 0.0
+      },
+      "ols": {
+        "before_clip": 0.0,
+        "after_clip": 0.007645
+      },
+      "wls_variance": {
+        "before_clip": 0.0,
+        "after_clip": 1.4e-05
+      },
+      "mint_shrink": {
+        "before_clip": 0.0,
+        "after_clip": 2.8e-05
+      }
+    },
+    "boroughs_sum_vs_city": {
+      "base": {
+        "before_clip": 0.018859,
+        "after_clip": 0.018859
+      },
+      "naive": {
+        "before_clip": 0.0,
+        "after_clip": 0.0
+      },
+      "bottom_up": {
+        "before_clip": 0.0,
+        "after_clip": 0.0
+      },
+      "ols": {
+        "before_clip": 0.0,
+        "after_clip": 0.003222
+      },
+      "wls_variance": {
+        "before_clip": 0.0,
+        "after_clip": 0.0
+      },
+      "mint_shrink": {
+        "before_clip": 0.0,
+        "after_clip": 0.0
+      }
+    }
+  },
+  "seconds": 473
 }
