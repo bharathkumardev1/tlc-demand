@@ -8,7 +8,7 @@ A forecasting service for NYC taxi pickups: LightGBM predictions per pickup zone
 
 **Headline.** Over three test weeks in June 2023 (one-hour horizon, all zones), the model has a WAPE of 0.2415. The strongest of the three baselines is the same slot one week earlier at 0.3104, so the model's error is 22% lower. Repeating the latest count scores 0.3476 and the same slot yesterday 0.3716. In the half of zones with the lowest volume the model loses to every baseline; those zones carry 0.28% of trips.
 
-**Demo.** No hosted demo. After installing, two commands bring the service up locally (see "Run it") and a real session is shown below.
+**Demo.** A recorded walkthrough of about 2 minutes is at https://youtu.be/Hd28gbz9jy0 (there is no hosted demo). After installing, two commands bring the service up locally (see "Run it") and a real session is shown below.
 
 ### Example session
 
