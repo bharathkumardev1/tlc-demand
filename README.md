@@ -146,18 +146,16 @@ Python 3.11 or later, plus Java 17 and Maven for the gateway.
 ```
 pip install -e '.[dev]'
 pytest -q                                   # 32 tests, synthetic data
-mvn -B -f gateway/pom.xml test              # 6 gateway tests
+mvn -B -f gateway/pom.xml test              # 6 gateway tests (last run: results/gateway_tests.txt)
 ```
 
-Data (not in the repo; the download is not scripted):
+Data (not in the repo; about 320 MB):
 
 ```
-mkdir -p data/raw && cd data/raw
-for m in 01 02 03 04 05 06; do curl -O https://d37ci6vzurychx.cloudfront.net/trip-data/yellow_tripdata_2023-$m.parquet; done
-curl -O https://d37ci6vzurychx.cloudfront.net/misc/taxi_zone_lookup.csv
+scripts/fetch_tlc.sh data/raw
 ```
 
-I checked that the host answers; the loop above has not been run as written.
+This downloads the six 2023 yellow-taxi files and the zone lookup. I ran it into an empty directory and the files are byte-identical to the ones the results came from.
 
 ```
 python scripts/run_backtest.py data/raw 2023 1 6 --horizon 4   # about 5 minutes on 2 vCPU

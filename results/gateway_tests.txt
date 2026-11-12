@@ -1,0 +1,11 @@
+Gateway test run, from gateway/target/surefire-reports (mvn -B -f gateway/pom.xml test)
+Run: 2026-11-11, Java 17, Maven, Spring Boot test context, model service stubbed.
+
+dev.bharath.gateway.GatewayTest: tests 6, failures 0, errors 0, skipped 0
+  servesTheModelWhenItIsHealthy
+  fallsBackToSeasonalNaiveOnModelError
+  fallsBackWhenTheModelIsSlowerThanTheTimeout
+  breakerOpensAndStopsCallingTheModel
+  rejectsZonesOutsideTheLookupRange
+  noHistoryIsA404AndDoesNotTripTheBreaker
+BUILD SUCCESS
