@@ -2,7 +2,7 @@
 
 A forecasting service for NYC taxi pickups: LightGBM predictions per pickup zone, served through a FastAPI model service and a Java gateway that falls back to a stored value when the model is slow or down.
 
-**Problem.** For each of the 262 TLC pickup zones, predict how many yellow-taxi pickups the zone will see in the 15-minute slot that starts an hour after the latest slot we have seen, and serve that prediction with a plan for when the model is unavailable.
+**Problem.** For each of the 262 TLC pickup zones, predict how many yellow-taxi pickups the zone will see in the 15-minute slot that starts an hour after the latest slot we have seen (observed data ends 45 minutes before that slot starts), and serve that prediction with a plan for when the model is unavailable.
 
 **Approach.** A Poisson LightGBM model on leakage-checked features (recent counts, rolling means, the same slot a day and a week earlier, calendar fields), scored with a rolling-origin backtest against three simple baselines, exported to ONNX, and served behind a Spring Boot gateway with a timeout and a circuit breaker.
 
@@ -29,9 +29,9 @@ The service reports 258 zones where the backtest scores 262. The ONNX parity run
 
 The gateway behaves the same way in front of this service. `scripts/gateway_integration.py` starts both, kills the model service, and records what the gateway does (`results/gateway_integration.json`): with the model up, gateway answers equal direct model answers (largest difference 0.0). With the model killed, all 40 requests came back from the fallback, 10 as `model_error` before the breaker opened and 30 as `breaker_open`. After the model restarted and the breaker's 10 s open interval passed, 20 of 20 requests were served by the model again.
 
-## Results
+## Backtest and ablations
 
-All numbers come from `results/*.json`, rendered into this file by `docs/readme_tables.py`. Data is yellow-taxi trips from January to June 2023. Timing: an origin is the start of a 15-minute slot, `lag_0` is the count in that slot, so observed data ends 15 minutes after the origin, and the target is the slot that starts 60 minutes after the origin. The forecast therefore reaches 45 minutes past the end of observed data, and the baselines use the same convention. The seasonal-naive column repeats the same slot one week earlier. The other two baselines repeat the latest observed 15-minute count (the origin bin, an hour before the target) and the same slot one day earlier; all four forecasts are scored on the same rows. Each test fold trains on rows whose target slot starts before its week minus 60 minutes, so no training target overlaps the test window. The model behind the example session below stops the same way before 24 June 2023, the first day of its held-out week.
+All numbers come from `results/*.json`, rendered into this file by `docs/readme_tables.py`. Data is yellow-taxi trips from January to June 2023. Timing: an origin is the start of a 15-minute slot, `lag_0` is the count in that slot, so observed data ends 15 minutes after the origin, and the target is the slot that starts 60 minutes after the origin. Observed data therefore ends 45 minutes before the target slot starts, and the baselines use the same convention. The seasonal-naive column repeats the same slot one week earlier. The other two baselines repeat the latest observed 15-minute count (the origin bin, an hour before the target) and the same slot one day earlier; all four forecasts are scored on the same rows. Each test fold trains on rows whose target slot starts before its week minus 60 minutes, so no training target overlaps the test window. The model behind the example session below stops the same way before 24 June 2023, the first day of its held-out week.
 
 <!-- table:backtest -->
 | Test week starting | WAPE model | WAPE seasonal-naive (same slot last week) | WAPE last count | WAPE same slot yesterday | MAE model | MAE seasonal-naive |
