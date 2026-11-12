@@ -18,7 +18,3 @@ tests/test_service.py asserts both bounds on a small synthetic model (99th perce
 
 ## Consequences
 Anyone changing the feature set must rerun scripts/check_onnx_parity.py and update these numbers.
-
-## Gateway fallback
-
-The Java gateway answers from `fallback.csv` when the model service times out or its breaker is open. That file holds one number per zone, written once by `scripts/make_history.py` (the count for the same slot a week before the snapshot's next target bin). The gateway does not compute a forecast on the fallback path, so the value stays fixed until the file is regenerated. `results/gateway_integration.json` records one run of the gateway against the real service with the service killed and restarted.

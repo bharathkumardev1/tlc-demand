@@ -65,7 +65,7 @@ That is a gain of 0.0006 WAPE, smaller than the seed-to-seed spread I measured (
 
 ### Which features matter
 
-Dropping one feature group at a time and retraining, same folds and settings. The three full-model rows are the same model with different seeds, which gives the noise floor.
+Dropping one feature group at a time and retraining, same folds and settings. The three full-model rows are the same model with different seeds, which gives the noise floor. The only seed-dependent part of training here is the 0.9 feature fraction (no bagging, deterministic mode, one thread), so that floor is narrower than the seed spread of a model with row sampling, and each ablated run used a single seed.
 
 <!-- table:ablation -->
 | Run (seed 0 unless noted) | Features | WAPE | Change vs full |
@@ -160,6 +160,8 @@ client -> Spring Boot gateway (Java 17, resilience4j)
 
 The panel holds explicit zeros because a zone with no pickups in a quarter hour is a real observation, and lag features over a sparse panel would silently read the wrong row. Features are computed relative to each forecast origin, and `tests/test_pipeline.py` checks that changing any value after the origin never changes the features, and that the online feature path matches the batch path. The history store is a snapshot loaded at startup, and its age is exported so a stale snapshot shows up in metrics.
 
+The gateway answers `GET /v1/forecast/{zone}` with `{zone, trips, source, modelVersion}`. `source` is `model` when the FastAPI service answered. When the fallback answers, `source` is `seasonal_naive_fallback`, the name the API was given early on, and the value is the static per-zone snapshot described next, not a forecast computed for that request. The model service itself takes `POST /v1/forecast` with `{"zone": n}`.
+
 The gateway's fallback is one number per zone, a static snapshot: `make_history.py` writes `artifacts/fallback.csv` once, holding the count for the same slot a week before the snapshot's next target bin. It is a seasonal-naive value for that one slot and the gateway returns it unchanged until the file is regenerated. The gateway computes nothing per request on this path, so during a long outage the value drifts away from the right time of day.
 
 ## Run it
@@ -203,11 +205,12 @@ For the 2020 check, run `scripts/fetch_tlc.sh data/raw2020 2020 1 6` first. To c
 - **Hyperparameters are fixed.** Learning rate 0.05, 31 leaves, 50 rows per leaf, feature fraction 0.9, 300 rounds, Poisson loss; no tuning and no early stopping. The comparisons here (model against baselines, one feature group dropped at a time) all use the same settings, so they do not depend on tuning, but I did not measure how much a tuned model would gain, and a tuned model could shift which feature groups matter.
 - **The gateway fallback is a stored number.** One value per zone from `fallback.csv`, as described under Architecture. The gateway was run against the real service once (`results/gateway_integration.json`), from the test classpath because the Spring Boot repackage plugin could not be downloaded in my container, so I have not run the packaged jar.
 - **One horizon, one month of test data.** Everything is evaluated at one hour ahead on three weeks of June 2023. I haven't tested other horizons, other seasons, or holidays.
+- **The June weeks were used more than once.** The same three test weeks scored the model and the baselines, the feature ablation, the spike and hierarchy comparisons and the sparse-zone rule. Only the rule's threshold came from a separate validation week. No data was held back from all of these, so the headline is a backtest score and I have no untouched final test.
 - **No uncertainty on most comparisons.** Folds are three weeks, the seed noise is measured only for the full model, and the hierarchy and spike comparisons have no paired test.
 - **Drift monitor false-alarms.** 36 of 1,776 hourly checks on clean data, clustered on weekends. The threshold is only as good as its two-month calibration.
 - **The service forecasts from a snapshot.** There is no stream, so "live" forecasts are as old as the snapshot. A real deployment needs an ingestion path I haven't built.
 - **Not in this repo.** No container image, orchestration, warehouse, experiment tracker or model registry. The model artifact is a file produced by `export_model.py`.
-- **CI has not run on GitHub.** The workflow's two jobs (lint and Python tests, gateway tests) pass locally.
+- **CI covers lint, the Python tests and the gateway tests only.** It runs on GitHub on every push, and the run after the first push passed both jobs. It does not run the backtest or any script that needs the TLC data.
 - **Service load numbers are synthetic and from a 2 vCPU container, gateway not measured.** Forecast service, random zones, load generator on the same two CPUs (`results/loadtest.json`, three runs of 3,000 requests each): one request at a time, p50 2.4 ms, p95 3.3 to 3.4 ms, p99 5.7 to 6.1 ms, about 381 to 390 requests per second; four concurrent clients, p50 8.5 to 9.3 ms, p95 14.4 to 15.4 ms, p99 17.7 to 20.1 ms, about 404 to 442 requests per second. Throughput barely rises from one client to four because the two CPUs are shared with the load generator, so treat it as a floor. The Spring Boot gateway has no timing.
 - **No hosted demo.**
 
