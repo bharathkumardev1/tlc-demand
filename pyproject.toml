@@ -12,6 +12,7 @@ dependencies = [
   "fastapi>=0.115",
   "pydantic>=2.7",
   "prometheus-client>=0.20",
+  "uvicorn>=0.30",
 ]
 
 [project.optional-dependencies]

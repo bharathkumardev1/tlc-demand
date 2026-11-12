@@ -168,7 +168,7 @@ The gateway's fallback is one number per zone, a static snapshot: `make_history.
 
 ## Run it
 
-Python 3.11 or later, plus Java 17 or later and Maven for the gateway. CI builds it on 17 and runs the Python tests on 3.12 only (3.11 and 3.13 are not exercised in CI; the local runs used 3.13), and the recorded local test run in `results/gateway_tests.txt` used JDK 21 with the 17 target.
+Python 3.11 or later (macOS's built-in Python 3.9 is too old; on a Mac also run `brew install libomp`, which LightGBM needs), plus Java 17 or later and Maven for the gateway. CI builds it on 17 and runs the Python tests on 3.12 only (3.11 and 3.13 are not exercised in CI; the local runs used 3.13), and the recorded local test run in `results/gateway_tests.txt` used JDK 21 with the 17 target.
 
 ```
 pip install -e '.[dev]'
