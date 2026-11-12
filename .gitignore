@@ -7,3 +7,5 @@ mlruns/
 *.parquet
 artifacts/
 gateway/target/
+
+*.log
