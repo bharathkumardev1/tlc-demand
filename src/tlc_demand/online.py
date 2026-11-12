@@ -20,7 +20,7 @@ def features_at_origin(history: np.ndarray, origin: pd.Timestamp, zone: int, hor
         raise ValueError(f"need at least {MIN_HISTORY} bins of history, got {len(history)}")
     y = np.asarray(history, dtype="float64")
     last = len(y) - 1
-    f: dict[str, float] = {f"lag_{l}": y[last - l] for l in ORIGIN_LAGS}
+    f: dict[str, float] = {f"lag_{lag}": y[last - lag] for lag in ORIGIN_LAGS}
     f["same_slot_1d"] = y[last - (BINS_PER_DAY - horizon)]
     f["same_slot_1w"] = y[last - (BINS_PER_WEEK - horizon)]
     for w in ROLL_WINDOWS:

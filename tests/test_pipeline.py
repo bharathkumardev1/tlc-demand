@@ -52,7 +52,10 @@ def test_same_slot_lags_point_at_target_minus_day_and_week(panel):
     f = make_features(panel, H)
     row = f[(f["zone"] == 10)].iloc[900]
     target = row["target_bin"]
-    look = lambda ts: panel[(panel["zone"] == 10) & (panel["bin"] == ts)]["y"].iloc[0]
+
+    def look(ts):
+        return panel[(panel["zone"] == 10) & (panel["bin"] == ts)]["y"].iloc[0]
+
     assert row["same_slot_1d"] == look(target - pd.Timedelta(days=1))
     assert row["same_slot_1w"] == look(target - pd.Timedelta(days=7))
 

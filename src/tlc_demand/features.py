@@ -45,7 +45,7 @@ def make_features(panel: pd.DataFrame, horizon: int) -> pd.DataFrame:
 
 
 FEATURE_COLUMNS = (
-    [f"lag_{l}" for l in ORIGIN_LAGS]
+    [f"lag_{lag}" for lag in ORIGIN_LAGS]
     + ["same_slot_1d", "same_slot_1w"]
     + [f"roll_mean_{w}" for w in ROLL_WINDOWS]
     + ["tod", "dow", "is_weekend", "tod_sin", "tod_cos", "zone"]

@@ -71,7 +71,7 @@ def fallback_counts() -> dict:
 
 
 def main() -> None:
-    fb = {int(a): float(b) for a, b in (l.split(",") for l in (ART / "fallback.csv").read_text().splitlines()[1:])}
+    fb = {int(a): float(b) for a, b in (line.split(",") for line in (ART / "fallback.csv").read_text().splitlines()[1:])}
     model = start_model()
     gw = subprocess.Popen(gateway_command(), cwd=ROOT, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
     out: dict = {"zones": ZONES, "gateway_started_from": "classpath" if not os.environ.get("GATEWAY_CMD") else "GATEWAY_CMD"}

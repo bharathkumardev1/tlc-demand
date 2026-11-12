@@ -29,7 +29,10 @@ def backtest():
     rows = [[f["test_start"][:10]] + [f"{f[k]:.4f}" for k in keys] + [f"{f['mae_model']:.3f}", f"{f['mae_naive']:.3f}"]
             for f in b["folds"]]
     n = len(b["folds"])
-    avg = lambda k: sum(f[k] for f in b["folds"]) / n
+
+    def avg(k):
+        return sum(f[k] for f in b["folds"]) / n
+
     rows.append(["mean of folds"] + [f"{avg(k):.4f}" for k in keys] + [f"{avg('mae_model'):.3f}", f"{avg('mae_naive'):.3f}"])
     return table(["Test week starting", "WAPE model", "WAPE seasonal-naive (same slot last week)", "WAPE last count",
                   "WAPE same slot yesterday", "MAE model", "MAE seasonal-naive"], rows)

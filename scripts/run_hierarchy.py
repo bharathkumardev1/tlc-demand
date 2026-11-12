@@ -96,7 +96,8 @@ for k in range(1, len(folds)):
         per_fold[folds[k]][m] = {}
         for lv, sl in levels.items():
             e, a = np.abs(Y[:, sl] - M[:, sl]).sum(), np.abs(Y[:, sl]).sum()
-            acc[m][lv][0] += e; acc[m][lv][1] += a
+            acc[m][lv][0] += e
+            acc[m][lv][1] += a
             per_fold[folds[k]][m][lv] = round(e / a, 5)
 res = {m: {lv: round(v[0] / v[1], 5) for lv, v in d.items()} for m, d in acc.items()}
 Path("results/hierarchy.json").write_text(json.dumps({

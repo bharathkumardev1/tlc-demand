@@ -13,7 +13,6 @@ full-model rows are the reference rather than the float64 backtest.
 Usage: python scripts/make_features_cache.py data/raw 2023 1 6 artifacts/features_h4.parquet
        python scripts/run_ablation.py   (writes results/ablation.json; needs about 4 GB of memory)"""
 import json
-import sys
 import time
 from pathlib import Path
 
