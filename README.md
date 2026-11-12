@@ -2,7 +2,7 @@
 
 A forecasting service for NYC taxi pickups: LightGBM predictions per pickup zone, served through a FastAPI model service and a Java gateway that falls back to a stored value when the model is slow or down.
 
-**Problem.** For each of the 262 TLC pickup zones, predict how many yellow-taxi pickups the zone will see in the 15-minute slot an hour from now, and serve that prediction with a plan for when the model is unavailable.
+**Problem.** For each of the 262 TLC pickup zones, predict how many yellow-taxi pickups the zone will see in the 15-minute slot that starts an hour after the latest slot we have seen, and serve that prediction with a plan for when the model is unavailable.
 
 **Approach.** A Poisson LightGBM model on leakage-checked features (recent counts, rolling means, the same slot a day and a week earlier, calendar fields), scored with a rolling-origin backtest against three simple baselines, exported to ONNX, and served behind a Spring Boot gateway with a timeout and a circuit breaker.
 
@@ -25,11 +25,13 @@ $ curl -s -X POST localhost:8000/v1/forecast -H 'Content-Type: application/json'
 {"zone":1,"origin":"2023-06-30 23:45:00","target":"2023-07-01 00:45:00","horizon_bins":4,"trips":0.136,"model_version":"dev"}
 ```
 
+The service reports 258 zones where the backtest scores 262. The ONNX parity run covers 173,376 rows (258 zones x 672 slots) against 176,064 in the backtest (262 x 672), so the service holds four fewer zones than the backtest scores. I did not trace which four or why.
+
 The gateway behaves the same way in front of this service. `scripts/gateway_integration.py` starts both, kills the model service, and records what the gateway does (`results/gateway_integration.json`): with the model up, gateway answers equal direct model answers (largest difference 0.0). With the model killed, all 40 requests came back from the fallback, 10 as `model_error` before the breaker opened and 30 as `breaker_open`. After the model restarted and the breaker's 10 s open interval passed, 20 of 20 requests were served by the model again.
 
 ## Results
 
-All numbers come from `results/*.json`, rendered into this file by `docs/readme_tables.py`. Training data is yellow-taxi trips from January to June 2023. The seasonal-naive column repeats the same slot one week earlier. The other two baselines repeat the latest observed 15-minute count (the origin bin, an hour before the target) and the same slot one day earlier; all four forecasts are scored on the same rows. Each test fold trains on everything strictly before its week, minus a gap of one horizon so no training target overlaps the test window.
+All numbers come from `results/*.json`, rendered into this file by `docs/readme_tables.py`. Data is yellow-taxi trips from January to June 2023. Timing: an origin is the start of a 15-minute slot, `lag_0` is the count in that slot, so observed data ends 15 minutes after the origin, and the target is the slot that starts 60 minutes after the origin. The forecast therefore reaches 45 minutes past the end of observed data, and the baselines use the same convention. The seasonal-naive column repeats the same slot one week earlier. The other two baselines repeat the latest observed 15-minute count (the origin bin, an hour before the target) and the same slot one day earlier; all four forecasts are scored on the same rows. Each test fold trains on rows whose target slot starts before its week minus 60 minutes, so no training target overlaps the test window. The model behind the example session below stops the same way before 24 June 2023, the first day of its held-out week.
 
 <!-- table:backtest -->
 | Test week starting | WAPE model | WAPE seasonal-naive (same slot last week) | WAPE last count | WAPE same slot yesterday | MAE model | MAE seasonal-naive |
@@ -61,11 +63,11 @@ The two lowest-volume quartiles of zones, together 0.28% of trips, score worse t
 | Routed: seasonal-naive below 0.316 trips/bin | 0.2406 | 1.0311 |
 <!-- /table:sparse -->
 
-That is a gain of 0.0006 WAPE, smaller than the seed-to-seed spread I measured (about 0.0003 per run, so I would not claim it generalises). The fix I would want is a different loss or a zone-level shrinkage model for sparse series, and I haven't built it.
+That is a gain of 0.0006 WAPE. The routed model is ahead in each of the three folds (by 0.0007, 0.00005 and 0.0009), with one seed trained, and seed differences in a single fold reach 0.00073, so I do not read it as an effect. The fix I would want is a different loss or a zone-level shrinkage model for sparse series, and I haven't built it.
 
 ### Which features matter
 
-Dropping one feature group at a time and retraining, same folds and settings. The three full-model rows are the same model with different seeds, which gives the noise floor. The only seed-dependent part of training here is the 0.9 feature fraction (no bagging, deterministic mode, one thread), so that floor is narrower than the seed spread of a model with row sampling, and each ablated run used a single seed.
+Dropping one feature group at a time and retraining, same folds and settings. The three full-model rows are the same model with different seeds. The only seed-dependent part of training is the 0.9 feature fraction (no bagging, deterministic mode, one thread), and each ablated run used a single seed. The three-fold mean moves by up to 0.0003 between seeds, and a single fold by up to 0.00073 (fold 1) and 0.00055 (fold 2).
 
 <!-- table:ablation -->
 | Run (seed 0 unless noted) | Features | WAPE | Change vs full |
@@ -80,7 +82,7 @@ Dropping one feature group at a time and retraining, same folds and settings. Th
 | minus_zone | 17 | 0.24604 | +0.00460 |
 <!-- /table:ablation -->
 
-Calendar features and the same-slot values from a day and a week earlier carry most of the signal; the seven lag features add 0.0007, which is about twice the seed-to-seed difference. The model could drop the lags and cost almost nothing. (ADR 002.)
+Calendar features and the same-slot values from a day and a week earlier carry most of the signal; removing the seven lag features costs 0.0007, more than the 0.0003 seed difference in the mean but about the size of the single-fold seed differences, so I would not call the lags useful or useless. Every ablated run is worse than the full model in all three folds. (ADR 002.)
 
 ### Zone, borough and city together
 
@@ -143,7 +145,7 @@ The service exports a population stability index (PSI) for four features as Prom
 Threshold 0.135. False alarms on clean April to mid-June data: 36 of 1,776 hourly evaluations.
 <!-- /table:drift -->
 
-It catches a sustained 1.3x level shift in about a day and misses a one-hour clock shift by a hair (0.133 against 0.135). The control run, with nothing injected, also alerts, at 42 h with a max PSI of 0.13641 against the 0.13475 threshold, so the 22 h and 31 h detection delays cannot be cleanly separated from a false alarm of that size. On clean data the false-alarm rate is too high to page anyone, and I would send it to a dashboard. On the real 2020 collapse it alerted on 14 March, about three days after daily trips fell below 80% of normal, which is slower than someone watching total trips. Each scenario ran once, so the delays carry no interval. (ADR 005.)
+It catches a sustained 1.3x level shift in about a day and misses a one-hour clock shift (0.133 against a 0.135 threshold). The control run, with nothing injected, also alerts, at 42 h with a max PSI of 0.13641 against the 0.13475 threshold, so the 22 h and 31 h detection delays cannot be cleanly separated from a false alarm of that size. On clean data it false-alarms on 8 distinct days, so I would send it to a dashboard and not to a pager. On the real 2020 collapse it alerted on 14 March, about three days after daily trips fell below 80% of normal, which is slower than someone watching total trips. Each scenario ran once, so the delays carry no interval. (ADR 005.)
 
 ## Architecture
 
@@ -166,11 +168,11 @@ The gateway's fallback is one number per zone, a static snapshot: `make_history.
 
 ## Run it
 
-Python 3.11 or later, plus Java 17 or later and Maven for the gateway. CI builds it on 17, and the recorded local test run in `results/gateway_tests.txt` used JDK 21 with the 17 target.
+Python 3.11 or later, plus Java 17 or later and Maven for the gateway. CI builds it on 17 and runs the Python tests on 3.12 only (3.11 and 3.13 are not exercised in CI; the local runs used 3.13), and the recorded local test run in `results/gateway_tests.txt` used JDK 21 with the 17 target.
 
 ```
 pip install -e '.[dev]'
-ruff check . && pytest -q                   # lint, then 32 tests on synthetic data
+ruff check . && pytest -q                   # lint, then 33 tests on synthetic data
 mvn -B -f gateway/pom.xml test              # 6 gateway tests (last run: results/gateway_tests.txt)
 ```
 
@@ -201,17 +203,17 @@ For the 2020 check, run `scripts/fetch_tlc.sh data/raw2020 2020 1 6` first. To c
 
 ## What is still rough
 
-- **Sparse zones are worse than every baseline.** See above. The routing rule's gain is inside the noise.
-- **Hyperparameters are fixed.** Learning rate 0.05, 31 leaves, 50 rows per leaf, feature fraction 0.9, 300 rounds, Poisson loss; no tuning and no early stopping. The comparisons here (model against baselines, one feature group dropped at a time) all use the same settings, so they do not depend on tuning, but I did not measure how much a tuned model would gain, and a tuned model could shift which feature groups matter.
-- **The gateway fallback is a stored number.** One value per zone from `fallback.csv`, as described under Architecture. The gateway was run against the real service once (`results/gateway_integration.json`), from the test classpath because the Spring Boot repackage plugin could not be downloaded in my container, so I have not run the packaged jar.
-- **One horizon, one month of test data.** Everything is evaluated at one hour ahead on three weeks of June 2023. I haven't tested other horizons, other seasons, or holidays.
+- **Sparse zones are worse than every baseline.** See above. The routing rule gains 0.0006 WAPE, the same size as single-fold seed differences.
+- **Hyperparameters are fixed.** Learning rate 0.05, 31 leaves, 50 rows per leaf, feature fraction 0.9, 300 rounds, Poisson loss; no tuning and no early stopping. The comparisons here (model against baselines, one feature group dropped at a time) all use the same settings, so they do not depend on tuning. A tuned model might gain accuracy and might shift which feature groups matter; that is unmeasured.
+- **The gateway fallback is a stored number.** One value per zone from `fallback.csv`, as described under Architecture. The gateway was run against the real service once (`results/gateway_integration.json`), from the test classpath because the Spring Boot repackage plugin could not be downloaded in my container, so the packaged jar has never been run.
+- **One horizon, one month of test data.** Everything is evaluated with a target slot starting 60 minutes after the origin, on three weeks of June 2023. Other horizons, other seasons and holidays are untested.
 - **The June weeks were used more than once.** The same three test weeks scored the model and the baselines, the feature ablation, the spike and hierarchy comparisons and the sparse-zone rule. Only the rule's threshold came from a separate validation week. No data was held back from all of these, so the headline is a backtest score and I have no untouched final test.
-- **No uncertainty on most comparisons.** Folds are three weeks, the seed noise is measured only for the full model, and the hierarchy and spike comparisons have no paired test.
-- **Drift monitor false-alarms.** 36 of 1,776 hourly checks on clean data, clustered on weekends. The threshold is only as good as its two-month calibration.
-- **The service forecasts from a snapshot.** There is no stream, so "live" forecasts are as old as the snapshot. A real deployment needs an ingestion path I haven't built.
+- **No uncertainty on most comparisons.** Folds are three weeks, seed spread is measured only for the full model, from three seeds, and the hierarchy and spike comparisons have no paired test.
+- **Drift monitor false-alarms.** 36 of 1,776 hourly checks on clean data, on 8 distinct days: 4 weekend days, 3 Mondays and 1 Friday. The threshold is only as good as its two-month calibration.
+- **The service forecasts from a snapshot.** There is no stream, so "live" forecasts are as old as the snapshot. A real deployment needs an ingestion path, which does not exist here.
 - **Not in this repo.** No container image, orchestration, warehouse, experiment tracker or model registry. The model artifact is a file produced by `export_model.py`.
-- **CI covers lint, the Python tests and the gateway tests only.** It runs on GitHub on every push, and the run after the first push passed both jobs. It does not run the backtest or any script that needs the TLC data.
-- **Service load numbers are synthetic and from a 2 vCPU container, gateway not measured.** Forecast service, random zones, load generator on the same two CPUs (`results/loadtest.json`, three runs of 3,000 requests each): one request at a time, p50 2.4 ms, p95 3.3 to 3.4 ms, p99 5.7 to 6.1 ms, about 381 to 390 requests per second; four concurrent clients, p50 8.5 to 9.3 ms, p95 14.4 to 15.4 ms, p99 17.7 to 20.1 ms, about 404 to 442 requests per second. Throughput barely rises from one client to four because the two CPUs are shared with the load generator, so treat it as a floor. The Spring Boot gateway has no timing.
+- **CI covers lint, the Python tests and the gateway tests only.** Ruff checks for syntax errors, undefined or unused names and import-time problems (E4, E7, E9, F), not style. It runs on GitHub on every push, and the run after the first push passed both jobs. It does not run the backtest or any script that needs the TLC data.
+- **Service load numbers are synthetic and from a 2 vCPU container, gateway not measured.** Forecast service, random zones, load generator on the same two CPUs (`results/loadtest.json`, three runs of 3,000 requests each; about 3% of the random zones have no history and get a 404, which the generator counts as answered): one request at a time, p50 2.4 ms, p95 3.3 to 3.4 ms, p99 5.7 to 6.1 ms, about 381 to 390 requests per second; four concurrent clients, p50 8.5 to 9.3 ms, p95 14.4 to 15.4 ms, p99 17.7 to 20.1 ms, about 404 to 442 requests per second. Throughput barely rises from one client to four because the two CPUs are shared with the load generator, so treat it as a floor. The Spring Boot gateway has no timing.
 - **No hosted demo.**
 
 ## Data and licence
