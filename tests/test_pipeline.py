@@ -82,12 +82,29 @@ def test_wape_handles_all_zero_actuals():
     assert np.isnan(wape(np.zeros(3), np.ones(3)))
 
 
-def test_backtest_is_deterministic_and_has_no_train_test_overlap(panel):
+def test_backtest_is_deterministic(panel):
     f = make_features(panel, H)
     r1 = run_backtest(f, H, test_days=7, n_folds=2, seed=3)
     r2 = run_backtest(f, H, test_days=7, n_folds=2, seed=3)
     assert [x.wape_model for x in r1] == [x.wape_model for x in r2]
     assert len(r1) == 2 and all(x.n_test > 0 for x in r1)
+
+
+def test_no_training_target_reaches_the_test_origins(panel):
+    from tlc_demand.backtest import folds, split_fold
+
+    f = make_features(panel, H)
+    seen = 0
+    for start, end in folds(f, 7, 2):
+        train, test = split_fold(f, start, end, H)
+        if train.empty or test.empty:
+            continue
+        seen += 1
+        # the earliest test origin is start minus the horizon gap
+        assert test["origin"].min() == start - pd.Timedelta(minutes=15 * H)
+        assert train["target_bin"].max() < test["origin"].min()
+        assert not set(train.index) & set(test.index)
+    assert seen == 2
 
 
 def test_slices_cover_every_row_once(panel):

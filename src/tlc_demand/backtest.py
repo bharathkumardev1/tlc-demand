@@ -37,6 +37,19 @@ def folds(features: pd.DataFrame, test_days: int, n_folds: int) -> list[tuple[pd
     return out
 
 
+def split_fold(
+    features: pd.DataFrame, start: pd.Timestamp, end: pd.Timestamp, horizon: int
+) -> tuple[pd.DataFrame, pd.DataFrame]:
+    """Train and test rows for one fold. A training row is kept only when its target
+    falls before `start - gap`, which is the earliest origin of any test row, so no
+    training target lies inside the span the test rows can see."""
+    gap = pd.Timedelta(minutes=15 * horizon)
+    tb = features["target_bin"]
+    test = features[(tb >= start) & (tb < end)]
+    train = features[tb < start - gap]
+    return train, test
+
+
 def run_backtest(
     features: pd.DataFrame,
     horizon: int,
@@ -58,13 +71,9 @@ def run_backtest(
         "num_threads": 1,
     }
     p.update(params or {})
-    gap = pd.Timedelta(minutes=15 * horizon)
     results = []
     for start, end in folds(features, test_days, n_folds):
-        tb = features["target_bin"]
-        test = features[(tb >= start) & (tb < end)]
-        # train origins must have their target before the test window begins
-        train = features[features["target_bin"] < start - gap]
+        train, test = split_fold(features, start, end, horizon)
         if train.empty or test.empty:
             continue
         model = lgb.train(

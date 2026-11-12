@@ -1,7 +1,7 @@
 """Feature computation for a single forecast origin at serving time.
 
 Must produce exactly what features.make_features produces for the same origin.
-tests/test_online.py enforces that; any change to one side fails the other."""
+test_online_features_match_batch_features in tests/test_pipeline.py checks that; a change to one side fails the other."""
 from __future__ import annotations
 
 import numpy as np
