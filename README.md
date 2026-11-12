@@ -51,7 +51,7 @@ WAPE is the sum of absolute errors over the sum of actual trips, so it is domina
 | q4_highest | 98.47% | 0.222 | 0.291 | 0.329 | 0.353 | model |
 <!-- /table:volume_tiers -->
 
-The two lowest-volume quartiles of zones, together 0.28% of trips, score worse than every baseline (same slot yesterday does best there). I tried routing those zones to seasonal-naive with a threshold chosen on a separate validation week (`scripts/sparse_zone_rule.py`):
+The two lowest-volume quartiles of zones, together 0.28% of trips, score worse than every baseline (same slot yesterday does best there). These quartiles rank zones by their trips in the test weeks, which sorts by the outcome. Ranking by trips before the first test week instead (`scripts/slices_by_training_volume.py`, `results/slices_training_volume.json`) moves 26 of 262 zones to a different quartile and leaves the finding in place: the model scores 2.342 and 1.929 in the two lowest quartiles against 1.923 and 1.838 for same slot yesterday, on 0.30% of trips. I tried routing those zones to seasonal-naive with a threshold chosen on a separate validation week (`scripts/sparse_zone_rule.py`):
 
 <!-- table:sparse -->
 | Pooled, three June folds | WAPE | MAE |

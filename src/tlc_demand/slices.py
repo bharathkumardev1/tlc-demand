@@ -19,10 +19,13 @@ def _row(g: pd.DataFrame) -> pd.Series:
     })
 
 
-def slice_table(pred: pd.DataFrame) -> dict[str, pd.DataFrame]:
-    """Slices: zone volume tier (by trips in the test window), part of day, weekday vs weekend."""
+def slice_table(pred: pd.DataFrame, volume: pd.Series | None = None) -> dict[str, pd.DataFrame]:
+    """Slices: zone volume tier, part of day, weekday vs weekend.
+
+    By default the tier ranks zones by trips in the test window itself, which stratifies by the
+    outcome. Pass `volume` (trips per zone, indexed by zone) to rank on something known beforehand."""
     d = pred.copy()
-    vol = d.groupby("zone")["y"].sum()
+    vol = d.groupby("zone")["y"].sum() if volume is None else volume.reindex(d["zone"].unique()).fillna(0)
     # ranked first so qcut ties from many tiny zones don't collapse the bins
     tier = pd.qcut(vol.rank(method="first"), 4, labels=["q1_lowest", "q2", "q3", "q4_highest"])
     d["volume_tier"] = d["zone"].map(tier)

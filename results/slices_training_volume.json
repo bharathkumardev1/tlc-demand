@@ -1,0 +1,82 @@
+{
+  "horizon_bins": 4,
+  "ranked_by": "trips with target before 2023-06-10 00:00:00",
+  "zones": 262,
+  "zones_in_a_different_tier_than_realized_ranking": 26,
+  "volume_tier_by_prior_volume": [
+    {
+      "volume_tier": "q1_lowest",
+      "n": 133056.0,
+      "share_of_trips": 0.0006,
+      "wape_model": 2.3417,
+      "wape_naive": 1.9441,
+      "wape_last": 1.9609,
+      "wape_yesterday": 1.9226
+    },
+    {
+      "volume_tier": "q2",
+      "n": 131040.0,
+      "share_of_trips": 0.0024,
+      "wape_model": 1.9285,
+      "wape_naive": 1.8369,
+      "wape_last": 1.8475,
+      "wape_yesterday": 1.838
+    },
+    {
+      "volume_tier": "q3",
+      "n": 131040.0,
+      "share_of_trips": 0.0124,
+      "wape_model": 1.3822,
+      "wape_naive": 1.4379,
+      "wape_last": 1.4568,
+      "wape_yesterday": 1.4813
+    },
+    {
+      "volume_tier": "q4_highest",
+      "n": 133056.0,
+      "share_of_trips": 0.9846,
+      "wape_model": 0.2215,
+      "wape_naive": 0.2907,
+      "wape_last": 0.329,
+      "wape_yesterday": 0.3531
+    }
+  ],
+  "volume_tier_by_test_window_volume": [
+    {
+      "volume_tier": "q1_lowest",
+      "n": 133056.0,
+      "share_of_trips": 0.0005,
+      "wape_model": 2.4889,
+      "wape_naive": 1.9718,
+      "wape_last": 1.9615,
+      "wape_yesterday": 1.9239
+    },
+    {
+      "volume_tier": "q2",
+      "n": 131040.0,
+      "share_of_trips": 0.0023,
+      "wape_model": 1.9603,
+      "wape_naive": 1.8714,
+      "wape_last": 1.8845,
+      "wape_yesterday": 1.8463
+    },
+    {
+      "volume_tier": "q3",
+      "n": 131040.0,
+      "share_of_trips": 0.0124,
+      "wape_model": 1.3852,
+      "wape_naive": 1.4423,
+      "wape_last": 1.4606,
+      "wape_yesterday": 1.4899
+    },
+    {
+      "volume_tier": "q4_highest",
+      "n": 133056.0,
+      "share_of_trips": 0.9847,
+      "wape_model": 0.2215,
+      "wape_naive": 0.2907,
+      "wape_last": 0.329,
+      "wape_yesterday": 0.3531
+    }
+  ]
+}
