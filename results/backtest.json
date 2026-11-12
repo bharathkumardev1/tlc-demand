@@ -8,7 +8,11 @@
       "wape_model": 0.2336389059456353,
       "wape_naive": 0.2842755190637029,
       "mae_model": 1.0576438778259194,
-      "mae_naive": 1.2868672755361688
+      "mae_naive": 1.2868672755361688,
+      "wape_last": 0.34660833212046993,
+      "mae_last": 1.569037395492548,
+      "wape_yesterday": 0.3726041765995995,
+      "mae_yesterday": 1.6867161941112323
     },
     {
       "test_start": "2023-06-17 00:00:00",
@@ -16,7 +20,11 @@
       "wape_model": 0.23973297722094442,
       "wape_naive": 0.3182192943296212,
       "mae_model": 1.0156748680334529,
-      "mae_naive": 1.3481972464558343
+      "mae_naive": 1.3481972464558343,
+      "wape_last": 0.34689494576561575,
+      "mae_last": 1.469687159214831,
+      "wape_yesterday": 0.3599806415892129,
+      "mae_yesterday": 1.5251272264631044
     },
     {
       "test_start": "2023-06-24 00:00:00",
@@ -24,7 +32,11 @@
       "wape_model": 0.25100819450874906,
       "wape_naive": 0.3287173064212438,
       "mae_model": 1.0267236542152558,
-      "mae_naive": 1.344584923664122
+      "mae_naive": 1.344584923664122,
+      "wape_last": 0.34940403125919917,
+      "mae_last": 1.429201881134133,
+      "wape_yesterday": 0.38232533339257846,
+      "mae_yesterday": 1.5638631406761179
     }
   ],
   "slices": {
@@ -34,28 +46,36 @@
         "n": 133056.0,
         "share_of_trips": 0.0005,
         "wape_model": 2.4889,
-        "wape_naive": 1.9718
+        "wape_naive": 1.9718,
+        "wape_last": 1.9615,
+        "wape_yesterday": 1.9239
       },
       {
         "volume_tier": "q2",
         "n": 131040.0,
         "share_of_trips": 0.0023,
         "wape_model": 1.9603,
-        "wape_naive": 1.8714
+        "wape_naive": 1.8714,
+        "wape_last": 1.8845,
+        "wape_yesterday": 1.8463
       },
       {
         "volume_tier": "q3",
         "n": 131040.0,
         "share_of_trips": 0.0124,
         "wape_model": 1.3852,
-        "wape_naive": 1.4423
+        "wape_naive": 1.4423,
+        "wape_last": 1.4606,
+        "wape_yesterday": 1.4899
       },
       {
         "volume_tier": "q4_highest",
         "n": 133056.0,
         "share_of_trips": 0.9847,
         "wape_model": 0.2215,
-        "wape_naive": 0.2907
+        "wape_naive": 0.2907,
+        "wape_last": 0.329,
+        "wape_yesterday": 0.3531
       }
     ],
     "part_of_day": [
@@ -64,35 +84,45 @@
         "n": 132048.0,
         "share_of_trips": 0.0901,
         "wape_model": 0.3657,
-        "wape_naive": 0.4475
+        "wape_naive": 0.4475,
+        "wape_last": 0.7141,
+        "wape_yesterday": 0.707
       },
       {
         "part_of_day": "06-09",
         "n": 88032.0,
         "share_of_trips": 0.1193,
         "wape_model": 0.2905,
-        "wape_naive": 0.3626
+        "wape_naive": 0.3626,
+        "wape_last": 0.4546,
+        "wape_yesterday": 0.4413
       },
       {
         "part_of_day": "10-15",
         "n": 132048.0,
         "share_of_trips": 0.3272,
         "wape_model": 0.2131,
-        "wape_naive": 0.2776
+        "wape_naive": 0.2776,
+        "wape_last": 0.2702,
+        "wape_yesterday": 0.2974
       },
       {
         "part_of_day": "16-19",
         "n": 88032.0,
         "share_of_trips": 0.2539,
         "wape_model": 0.2079,
-        "wape_naive": 0.2735
+        "wape_naive": 0.2735,
+        "wape_last": 0.2664,
+        "wape_yesterday": 0.3095
       },
       {
         "part_of_day": "20-23",
         "n": 88032.0,
         "share_of_trips": 0.2095,
         "wape_model": 0.2438,
-        "wape_naive": 0.3139
+        "wape_naive": 0.3139,
+        "wape_last": 0.3483,
+        "wape_yesterday": 0.3785
       }
     ],
     "weekend": [
@@ -101,16 +131,20 @@
         "n": 377280.0,
         "share_of_trips": 0.7294,
         "wape_model": 0.2373,
-        "wape_naive": 0.3067
+        "wape_naive": 0.3067,
+        "wape_last": 0.3425,
+        "wape_yesterday": 0.3509
       },
       {
         "weekend": "weekend",
         "n": 150912.0,
         "share_of_trips": 0.2706,
         "wape_model": 0.2517,
-        "wape_naive": 0.3176
+        "wape_naive": 0.3176,
+        "wape_last": 0.3614,
+        "wape_yesterday": 0.4271
       }
     ]
   },
-  "seconds": 307
+  "seconds": 319
 }

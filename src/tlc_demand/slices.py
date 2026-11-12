@@ -8,12 +8,14 @@ from .metrics import wape
 
 
 def _row(g: pd.DataFrame) -> pd.Series:
-    ok = g["naive"].notna()
+    ok = g["naive"].notna() & g["last"].notna() & g["yday"].notna()
     return pd.Series({
         "n": int(ok.sum()),
         "share_of_trips": g["y"].sum(),
         "wape_model": wape(g.loc[ok, "y"].to_numpy(), g.loc[ok, "pred"].to_numpy()),
         "wape_naive": wape(g.loc[ok, "y"].to_numpy(), g.loc[ok, "naive"].to_numpy()),
+        "wape_last": wape(g.loc[ok, "y"].to_numpy(), g.loc[ok, "last"].to_numpy()),
+        "wape_yesterday": wape(g.loc[ok, "y"].to_numpy(), g.loc[ok, "yday"].to_numpy()),
     })
 
 

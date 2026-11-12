@@ -25,20 +25,26 @@ def table(header, rows):
 
 def backtest():
     b = load("backtest.json")
-    rows = [[f["test_start"][:10], f"{f['wape_model']:.4f}", f"{f['wape_naive']:.4f}",
-             f"{f['mae_model']:.3f}", f"{f['mae_naive']:.3f}"] for f in b["folds"]]
+    keys = ["wape_model", "wape_naive", "wape_last", "wape_yesterday"]
+    rows = [[f["test_start"][:10]] + [f"{f[k]:.4f}" for k in keys] + [f"{f['mae_model']:.3f}", f"{f['mae_naive']:.3f}"]
+            for f in b["folds"]]
     n = len(b["folds"])
     avg = lambda k: sum(f[k] for f in b["folds"]) / n
-    rows.append(["mean of folds", f"{avg('wape_model'):.4f}", f"{avg('wape_naive'):.4f}",
-                 f"{avg('mae_model'):.3f}", f"{avg('mae_naive'):.3f}"])
-    return table(["Test week starting", "WAPE model", "WAPE seasonal-naive", "MAE model", "MAE seasonal-naive"], rows)
+    rows.append(["mean of folds"] + [f"{avg(k):.4f}" for k in keys] + [f"{avg('mae_model'):.3f}", f"{avg('mae_naive'):.3f}"])
+    return table(["Test week starting", "WAPE model", "WAPE seasonal-naive (same slot last week)", "WAPE last count",
+                  "WAPE same slot yesterday", "MAE model", "MAE seasonal-naive"], rows)
 
 
 def volume_tiers():
     b = load("backtest.json")["slices"]["volume_tier"]
-    rows = [[t["volume_tier"], f"{t['share_of_trips']:.2%}", f"{t['wape_model']:.3f}", f"{t['wape_naive']:.3f}",
-             "model" if t["wape_model"] < t["wape_naive"] else "seasonal-naive"] for t in b]
-    return table(["Zone volume quartile", "Share of trips", "WAPE model", "WAPE seasonal-naive", "Better"], rows)
+    rows = []
+    for t in b:
+        base = min(t["wape_naive"], t["wape_last"], t["wape_yesterday"])
+        rows.append([t["volume_tier"], f"{t['share_of_trips']:.2%}", f"{t['wape_model']:.3f}", f"{t['wape_naive']:.3f}",
+                     f"{t['wape_last']:.3f}", f"{t['wape_yesterday']:.3f}",
+                     "model" if t["wape_model"] < base else "a baseline"])
+    return table(["Zone volume quartile", "Share of trips", "WAPE model", "WAPE seasonal-naive", "WAPE last count",
+                  "WAPE same slot yesterday", "Lowest WAPE"], rows)
 
 
 def ablation():

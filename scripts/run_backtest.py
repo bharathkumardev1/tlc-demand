@@ -52,7 +52,9 @@ if __name__ == "__main__":
               for k, v in slice_table(pd.concat(collected)).items()}
     rows = [
         {"test_start": str(r.test_start), "n_test": r.n_test, "wape_model": r.wape_model,
-         "wape_naive": r.wape_naive, "mae_model": r.mae_model, "mae_naive": r.mae_naive}
+         "wape_naive": r.wape_naive, "mae_model": r.mae_model, "mae_naive": r.mae_naive,
+         "wape_last": r.wape_last, "mae_last": r.mae_last,
+         "wape_yesterday": r.wape_yesterday, "mae_yesterday": r.mae_yesterday}
         for r in res
     ]
     for r in rows:

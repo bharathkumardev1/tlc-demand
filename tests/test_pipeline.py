@@ -92,11 +92,11 @@ def test_slices_cover_every_row_once(panel):
 
     f = make_features(panel, H)
     f = f[f["target_bin"] >= "2023-01-30"]
-    pred = f.assign(pred=f["lag_0"], naive=f["same_slot_1w"])[
-        ["zone", "target_bin", "tod", "y", "pred", "naive"]
+    pred = f.assign(pred=f["lag_0"], naive=f["same_slot_1w"], last=f["lag_0"], yday=f["same_slot_1d"])[
+        ["zone", "target_bin", "tod", "y", "pred", "naive", "last", "yday"]
     ]
     tables = slice_table(pred)
-    ok = pred["naive"].notna().sum()
+    ok = (pred["naive"].notna() & pred["last"].notna() & pred["yday"].notna()).sum()
     for t in tables.values():
         assert t["n"].sum() == ok
         assert abs(t["share_of_trips"].sum() - 1) < 1e-9

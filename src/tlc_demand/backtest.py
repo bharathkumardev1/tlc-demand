@@ -9,7 +9,7 @@ import lightgbm as lgb
 import numpy as np
 import pandas as pd
 
-from .baselines import seasonal_naive
+from .baselines import last_value, same_slot_yesterday, seasonal_naive
 from .features import FEATURE_COLUMNS
 from .metrics import mae, wape
 
@@ -22,6 +22,10 @@ class FoldResult:
     wape_naive: float
     mae_model: float
     mae_naive: float
+    wape_last: float = float("nan")
+    mae_last: float = float("nan")
+    wape_yesterday: float = float("nan")
+    mae_yesterday: float = float("nan")
 
 
 def folds(features: pd.DataFrame, test_days: int, n_folds: int) -> list[tuple[pd.Timestamp, pd.Timestamp]]:
@@ -70,11 +74,14 @@ def run_backtest(
         )
         pred = np.clip(model.predict(test[FEATURE_COLUMNS]), 0, None)
         naive = seasonal_naive(test)
-        ok = ~np.isnan(naive)
+        last = last_value(test)
+        yday = same_slot_yesterday(test)
+        # every baseline is scored on the same rows, so the comparison is like for like
+        ok = ~(np.isnan(naive) | np.isnan(last) | np.isnan(yday))
         y = test["y"].to_numpy()
         if collect is not None:
-            collect.append(test.assign(pred=pred, naive=naive, fold=str(start))[
-                ["zone", "target_bin", "tod", "y", "pred", "naive", "fold"]
+            collect.append(test.assign(pred=pred, naive=naive, last=last, yday=yday, fold=str(start))[
+                ["zone", "target_bin", "tod", "y", "pred", "naive", "last", "yday", "fold"]
             ])
         results.append(
             FoldResult(
@@ -84,6 +91,10 @@ def run_backtest(
                 wape_naive=wape(y[ok], naive[ok]),
                 mae_model=mae(y[ok], pred[ok]),
                 mae_naive=mae(y[ok], naive[ok]),
+                wape_last=wape(y[ok], last[ok]),
+                mae_last=mae(y[ok], last[ok]),
+                wape_yesterday=wape(y[ok], yday[ok]),
+                mae_yesterday=mae(y[ok], yday[ok]),
             )
         )
     return results

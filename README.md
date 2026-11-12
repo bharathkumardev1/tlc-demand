@@ -11,23 +11,23 @@ Short-horizon taxi demand forecasts for NYC's 262 pickup zones, built on the TLC
 All numbers come from `results/*.json`, rendered into this file by `docs/readme_tables.py`. Training data is yellow-taxi trips from January to June 2023. Each test fold trains on everything strictly before its week, minus a gap of one horizon so no training target overlaps the test window.
 
 <!-- table:backtest -->
-| Test week starting | WAPE model | WAPE seasonal-naive | MAE model | MAE seasonal-naive |
-|---|---|---|---|---|
-| 2023-06-10 | 0.2336 | 0.2843 | 1.058 | 1.287 |
-| 2023-06-17 | 0.2397 | 0.3182 | 1.016 | 1.348 |
-| 2023-06-24 | 0.2510 | 0.3287 | 1.027 | 1.345 |
-| mean of folds | 0.2415 | 0.3104 | 1.033 | 1.327 |
+| Test week starting | WAPE model | WAPE seasonal-naive (same slot last week) | WAPE last count | WAPE same slot yesterday | MAE model | MAE seasonal-naive |
+|---|---|---|---|---|---|---|
+| 2023-06-10 | 0.2336 | 0.2843 | 0.3466 | 0.3726 | 1.058 | 1.287 |
+| 2023-06-17 | 0.2397 | 0.3182 | 0.3469 | 0.3600 | 1.016 | 1.348 |
+| 2023-06-24 | 0.2510 | 0.3287 | 0.3494 | 0.3823 | 1.027 | 1.345 |
+| mean of folds | 0.2415 | 0.3104 | 0.3476 | 0.3716 | 1.033 | 1.327 |
 <!-- /table:backtest -->
 
 WAPE is the sum of absolute errors over the sum of actual trips, so it is dominated by busy zones. The next table shows where that leaves the quiet ones.
 
 <!-- table:volume_tiers -->
-| Zone volume quartile | Share of trips | WAPE model | WAPE seasonal-naive | Better |
-|---|---|---|---|---|
-| q1_lowest | 0.05% | 2.489 | 1.972 | seasonal-naive |
-| q2 | 0.23% | 1.960 | 1.871 | seasonal-naive |
-| q3 | 1.24% | 1.385 | 1.442 | model |
-| q4_highest | 98.47% | 0.222 | 0.291 | model |
+| Zone volume quartile | Share of trips | WAPE model | WAPE seasonal-naive | WAPE last count | WAPE same slot yesterday | Lowest WAPE |
+|---|---|---|---|---|---|---|
+| q1_lowest | 0.05% | 2.489 | 1.972 | 1.962 | 1.924 | a baseline |
+| q2 | 0.23% | 1.960 | 1.871 | 1.885 | 1.846 | a baseline |
+| q3 | 1.24% | 1.385 | 1.442 | 1.461 | 1.490 | model |
+| q4_highest | 98.47% | 0.222 | 0.291 | 0.329 | 0.353 | model |
 <!-- /table:volume_tiers -->
 
 The two lowest-volume quartiles of zones, together 0.28% of trips, score worse than the baseline. I tried routing those zones to seasonal-naive with a threshold chosen on a separate validation week (`scripts/sparse_zone_rule.py`):
