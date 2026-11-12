@@ -2,11 +2,19 @@ Gateway test run, from gateway/target/surefire-reports (mvn -B -f gateway/pom.xm
 Run: 2026-11-12, JDK 21.0.12 compiling for Java 17 (pom java.version), Maven, Spring Boot test context, model service stubbed.
 CI runs the same suite on Java 17.
 
-dev.bharath.gateway.GatewayTest: tests 6, failures 0, errors 0, skipped 0
+dev.bharath.gateway.GatewayTest (model timeout 5 s, so a cold JVM cannot fail the happy path): tests 5, failures 0, errors 0, skipped 0
   servesTheModelWhenItIsHealthy
   fallsBackToSeasonalNaiveOnModelError
-  fallsBackWhenTheModelIsSlowerThanTheTimeout
   breakerOpensAndStopsCallingTheModel
   rejectsZonesOutsideTheLookupRange
   noHistoryIsA404AndDoesNotTripTheBreaker
-BUILD SUCCESS
+
+dev.bharath.gateway.GatewaySlowModelTest (production 150 ms timeout, stub takes 2 s): tests 1, failures 0, errors 0, skipped 0
+  fallsBackWhenTheModelIsSlowerThanTheTimeout
+
+Repeat under load: three consecutive runs on a 2 vCPU container with four busy-loop processes
+running (load average 5.9 to 6.1 at the start of runs 2 and 3), all 6 tests passed each time.
+Test time rose from about 3 s to 7-10 s (GatewayTest) and 12-15 s (GatewaySlowModelTest).
+
+Packaging: `mvn package` and `java -jar` were not run. The container's Maven could not reach
+Maven Central for the jar plugin, so no jar was built here.
