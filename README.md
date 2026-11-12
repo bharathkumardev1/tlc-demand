@@ -174,7 +174,7 @@ python scripts/make_history.py data/raw 2023 6 artifacts/history.npz
 - **The service forecasts from a snapshot.** There is no stream, so "live" forecasts are as old as the snapshot. A real deployment needs an ingestion path I haven't built.
 - **Not in this repo.** No container image, orchestration, warehouse, experiment tracker or model registry. The model artifact is a file produced by `export_model.py`.
 - **CI has not run on GitHub.** The workflow's two jobs (Python tests, gateway tests) both pass locally.
-- **No latency or throughput numbers** for the service or the gateway.
+- **Service load numbers are synthetic and from a 2 vCPU container, gateway not measured.** Forecast service, random zones, load generator on the same two CPUs (`results/loadtest.json`, three runs of 3,000 requests each): one request at a time, p50 2.4 ms, p95 3.3 to 3.4 ms, p99 5.7 to 6.1 ms, about 381 to 390 requests per second; four concurrent clients, p50 8.5 to 9.3 ms, p95 14.4 to 15.4 ms, p99 17.7 to 20.1 ms, about 404 to 442 requests per second. Throughput barely rises from one client to four because the two CPUs are shared with the load generator, so treat it as a floor. The Spring Boot gateway has no timing.
 - **No hosted demo.**
 
 ## Data and licence
