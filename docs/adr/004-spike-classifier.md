@@ -7,7 +7,7 @@ Dispatch cares less about the exact count than about "this zone is about to be u
 
 Because of the 5-trip floor and the strict inequality, the rate of spikes is far below the 10% a pure quantile would give: about 1.7% in training and 1.6% to 2.7% in the test weeks.
 
-Metric: average precision (area under the precision-recall curve), since accuracy and ROC-AUC are dominated by the 98% non-spike rows. Intervals are a bootstrap over test days (resampling days, not rows, because rows within a day are strongly correlated).
+Metric: average precision (area under the precision-recall curve), since accuracy and ROC-AUC are dominated by the 98% non-spike rows. Intervals are a bootstrap over test days (resampling days instead of rows, because rows within a day are strongly correlated).
 
 I compared four scorers. The classifier is a LightGBM binary model on the forecast features plus the slot threshold and the lag and rolling mean divided by it. The other three need no extra model: the Poisson regression forecast divided by the slot threshold, last week's value for the slot divided by the threshold, and the latest count divided by it.
 
@@ -23,9 +23,9 @@ Per fold, the classifier is ahead of the regression ratio in all three (0.273 vs
 
 ## Findings
 - Both model-based scorers are about twice as good as the naive ones, so forecasting the spike is doing real work.
-- The classifier edges out the regression forecast: ahead in every fold, but the two intervals overlap and I have not run a paired test, so I would call the gap "small and consistent", not established. If the service already produces the forecast, thresholding it recovers about 89% of the classifier's AP (0.213 / 0.239) without a second model.
-- An AP of 0.24 means precision is low across most of the recall range; I did not compute precision at a specific alert threshold. This is a ranking signal for prioritizing zones, not something to page on.
-- The first fold has a much higher test spike rate (2.7%) than training (1.8%), and AP is higher there too, which is partly the base rate. Compare lift, not raw AP, across folds.
+- The classifier edges out the regression forecast: ahead in every fold, but the two intervals overlap and I have not run a paired test, so I would call the gap "small and consistent" and leave it unestablished. If the service already produces the forecast, thresholding it recovers about 89% of the classifier's AP (0.213 / 0.239) without a second model.
+- An AP of 0.24 means precision is low across most of the recall range; I did not compute precision at a specific alert threshold. The output works as a ranking for prioritizing zones and is too imprecise to page anyone.
+- The first fold has a much higher test spike rate (2.7%) than training (1.8%), and AP is higher there too, which is partly the base rate. Compare lift across folds, and treat raw AP with care.
 
 ## Not done
 No calibration of the classifier probabilities, no operating-point choice, no paired bootstrap between classifier and regression ratio, one seed, and one spike definition (0.9 quantile, 5-trip floor) with no sensitivity check.

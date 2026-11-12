@@ -8,7 +8,7 @@ The service should say when its inputs stop looking like the data it was trained
 Raw counts cannot be compared across requests: a window that happens to hit Midtown zones, or one taken at 3 am, differs from the reference for reasons that are not drift. The first version of the monitor false-alarmed on exactly that. Each value is now divided by the zone's mean for the same weekday and hour in the reference period, and PSI is computed inside four tiers of that expected count (noisy small-count ratios are kept apart from large-count ones) and averaged by tier share. Code is in `src/tlc_demand/drift.py`; the evaluation is `scripts/run_drift_eval.py`.
 
 ## How the alert threshold is set
-The threshold is the maximum PSI seen over a clean calibration period, not the textbook 0.25. For a window of 24 hours or 6 hours, PSI has a size-dependent floor of roughly (bins - 1) / n, so a fixed rule of thumb would alert constantly on small windows. Consequence: the threshold is only as good as the calibration period. In 2023 the two calibration months were calmer than the following three, and the false alarms below are the result.
+The threshold is the maximum PSI seen over a clean calibration period, where the textbook value would be 0.25. For a window of 24 hours or 6 hours, PSI has a size-dependent floor of roughly (bins - 1) / n, so a fixed rule of thumb would alert constantly on small windows. Consequence: the threshold is only as good as the calibration period. In 2023 the two calibration months were calmer than the following three, and the false alarms below are the result.
 
 ## Test 1: injected drift on 2023 data
 Reference January 8 to 31, calibration February 1 to March 31, clean evaluation April 1 to June 14, injection from 2023-06-15 00:00. Windows are rolling and evaluated hourly.
@@ -32,7 +32,7 @@ Same procedure on January to June 2020, reference January 8 to 31, calibration F
 ## What I'd say about it
 - It catches large, sustained level shifts. 1.3x everywhere is found in about a day.
 - It misses a one-hour clock shift at 24 hours (0.133 against 0.135, a near miss that a slightly different calibration period could flip), because the monitored values are slot-relative and a one-hour shift only changes them at the edges of rush periods.
-- The false alarm rate on clean data (36 of 1,776 hourly evaluations, mostly on weekends and the days next to them) is too high to page anyone. I would route it to a dashboard and a ticket, not to an on-call rotation.
+- The false alarm rate on clean data (36 of 1,776 hourly evaluations, mostly on weekends and the days next to them) is too high to page anyone. I would route it to a dashboard and a ticket and keep it off the on-call rotation.
 - 6-hour windows are not usable with this construction.
 
 ## Not done

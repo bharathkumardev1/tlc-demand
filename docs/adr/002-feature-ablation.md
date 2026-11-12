@@ -24,7 +24,7 @@ Every ablated run is worse than the full model in all three folds.
 ## Findings
 - The noise floor from seeds alone is about 0.0003 WAPE. Removing the lags (+0.0007) is only about twice that, so I would not say the lags matter. Seven lag columns carry almost nothing that the rolling means and same-slot values do not already carry.
 - Calendar, same-slot values and zone id each cost between 0.0046 and 0.0093 when removed, 15 to 30 times the noise floor. Calendar is the largest, which fits a demand series dominated by time of day and day of week.
-- Groups overlap, so each number understates what the group would be worth with nothing else standing in for it. This says what is redundant given the others, not what each group is worth alone.
+- Groups overlap, so each number understates what the group would be worth with nothing else standing in for it. The numbers show what is redundant given the others and say nothing about what each group is worth alone.
 - Removing the seven lags would cut the feature count from 18 to 11 for about 0.3% relative WAPE. I have not measured the serving cost of the lag features, so I am keeping them; they are the first thing to try removing if latency matters.
 
 ## An earlier, wrong version of this experiment
