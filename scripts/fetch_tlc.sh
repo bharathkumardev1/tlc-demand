@@ -1,7 +1,8 @@
 #!/usr/bin/env bash
 # Download the NYC TLC yellow-taxi files and the zone lookup used by the README quickstart.
-#   scripts/fetch_tlc.sh data/raw            # 2023-01 to 2023-06
-#   scripts/fetch_tlc.sh data/raw2020 2020 1 2   # year, first month, last month
+#   scripts/fetch_tlc.sh data/raw                  # 2023-01 to 2023-06
+#   scripts/fetch_tlc.sh data/raw2020 2020 1 6     # the 2020 drift check loads months 1 to 6
+# Arguments after the directory are year, first month, last month.
 set -euo pipefail
 out=${1:?usage: fetch_tlc.sh OUT_DIR [YEAR FIRST_MONTH LAST_MONTH]}
 year=${2:-2023}; first=${3:-1}; last=${4:-6}

@@ -1,5 +1,9 @@
 """Compare ONNX and LightGBM predictions on the last week of real features.
-Tolerance is stated in the ADR: float32 trees are not bit-identical to float64."""
+Tolerance is stated in the ADR: float32 trees are not bit-identical to float64.
+
+python scripts/check_onnx_parity.py artifacts/ data/raw 2023 6
+Arguments: directory holding model.txt and model.onnx, directory of raw parquet files, year, month.
+Scores the last seven days of that month and writes results/onnx_parity.json."""
 import json
 import sys
 from pathlib import Path

@@ -10,7 +10,8 @@ columns are removed by slicing a column subset per run (about 200 MB). LightGBM'
 like the cheaper way but only applies when data is loaded from a text file; with an in-memory array it
 silently does nothing. Counts are exact integers in float32; rolling means round to float32, so the
 full-model rows are the reference rather than the float64 backtest.
-Usage: python scripts/run_ablation.py   (needs artifacts/features_h4.parquet, written by the cache step below)"""
+Usage: python scripts/make_features_cache.py data/raw 2023 1 6 artifacts/features_h4.parquet
+       python scripts/run_ablation.py   (writes results/ablation.json; needs about 4 GB of memory)"""
 import json
 import sys
 import time

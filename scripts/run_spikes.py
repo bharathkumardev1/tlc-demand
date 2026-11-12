@@ -2,7 +2,7 @@
 backtest. Thresholds and labels use training rows only. A dedicated classifier is compared with
 two cheaper scorers: the regression forecast divided by the slot threshold, and last week's value
 for the same slot divided by the threshold.
-Usage: python scripts/run_spikes.py   (needs artifacts/features_h4.parquet from run_ablation.py)"""
+Usage: python scripts/run_spikes.py   (needs artifacts/features_h4.parquet from make_features_cache.py)"""
 import json
 import time
 from pathlib import Path
