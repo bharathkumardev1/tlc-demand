@@ -164,7 +164,7 @@ The gateway's fallback is one number per zone, a static snapshot: `make_history.
 
 ## Run it
 
-Python 3.11 or later, plus Java 17 and Maven for the gateway.
+Python 3.11 or later, plus Java 17 or later and Maven for the gateway. CI builds it on 17, and the recorded local test run in `results/gateway_tests.txt` used JDK 21 with the 17 target.
 
 ```
 pip install -e '.[dev]'

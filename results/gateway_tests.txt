@@ -1,5 +1,6 @@
 Gateway test run, from gateway/target/surefire-reports (mvn -B -f gateway/pom.xml test)
-Run: 2026-11-11, Java 17, Maven, Spring Boot test context, model service stubbed.
+Run: 2026-11-12, JDK 21.0.12 compiling for Java 17 (pom java.version), Maven, Spring Boot test context, model service stubbed.
+CI runs the same suite on Java 17.
 
 dev.bharath.gateway.GatewayTest: tests 6, failures 0, errors 0, skipped 0
   servesTheModelWhenItIsHealthy

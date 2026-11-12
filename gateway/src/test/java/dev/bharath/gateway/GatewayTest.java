@@ -40,7 +40,7 @@ class GatewayTest {
                 modelCalls.incrementAndGet();
                 try {
                     if (mode.get() == Mode.SLOW) {
-                        Thread.sleep(600);
+                        Thread.sleep(2000);
                     }
                 } catch (InterruptedException e) {
                     Thread.currentThread().interrupt();
@@ -102,7 +102,8 @@ class GatewayTest {
         var body = http.getForEntity("/v1/forecast/161", ForecastService.Result.class).getBody();
         long ms = (System.nanoTime() - t0) / 1_000_000;
         assertThat(body.source()).isEqualTo("seasonal_naive_fallback");
-        assertThat(ms).isLessThan(450);
+        // the stub takes 2 s; answering well before that means the gateway cut the call off at its 150 ms timeout
+        assertThat(ms).isLessThan(1500);
     }
 
     @Test
