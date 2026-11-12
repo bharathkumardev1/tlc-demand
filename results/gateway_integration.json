@@ -1,0 +1,38 @@
+{
+  "zones": [
+    4,
+    13,
+    43,
+    79,
+    132,
+    161,
+    186,
+    230,
+    236,
+    237
+  ],
+  "gateway_started_from": "classpath",
+  "phase1_model_up": {
+    "sources": [
+      "model"
+    ],
+    "max_abs_diff_vs_direct_model_call": 0.0
+  },
+  "phase2_model_killed": {
+    "requests": 40,
+    "sources": {
+      "seasonal_naive_fallback": 40
+    },
+    "all_values_equal_fallback_csv": true,
+    "fallback_reasons": {
+      "breaker_open": 30.0,
+      "model_error": 10.0
+    }
+  },
+  "phase3_model_restarted": {
+    "requests": 20,
+    "sources": {
+      "model": 20
+    }
+  }
+}
