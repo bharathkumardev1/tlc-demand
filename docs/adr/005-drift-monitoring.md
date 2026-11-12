@@ -15,7 +15,7 @@ Reference January 8 to 31, calibration February 1 to March 31, clean evaluation 
 
 Thresholds: 0.135 for 24-hour windows, 0.796 for 6-hour windows.
 
-False alarms on clean April to June data: 36 of 1,776 evaluations for 24-hour windows (8 distinct days, seven of them a weekend day or a Monday; I did not investigate causes), and 7 of 1,794 for 6-hour windows. The threshold from a two-month calibration does not hold up for three more months.
+False alarms on clean April to June data: 36 of 1,776 evaluations for 24-hour windows (8 distinct days: 4 weekend days, 3 Mondays and 1 Friday; I did not investigate causes), and 7 of 1,794 for 6-hour windows. The threshold from a two-month calibration does not hold up for three more months.
 
 | Injection from 06-15 | 24 h window, hours to first alert | 24 h share of windows alerting | 6 h window, hours to first alert |
 |---|---|---|---|
@@ -31,8 +31,8 @@ Same procedure on January to June 2020, reference January 8 to 31, calibration F
 
 ## What I'd say about it
 - It catches large, sustained level shifts. 1.3x everywhere is found in about a day.
-- It misses a one-hour clock shift at 24 hours (0.133 against 0.135, a near miss that a slightly different calibration period could flip), because the monitored values are slot-relative and a one-hour shift only changes them at the edges of rush periods.
-- The false alarm rate on clean data (36 of 1,776 hourly evaluations, mostly on weekends and the days next to them) is too high to page anyone. I would route it to a dashboard and a ticket and keep it off the on-call rotation.
+- It misses a one-hour clock shift at 24 hours (0.133 against 0.135; a different calibration period could flip it), because the monitored values are slot-relative and a one-hour shift only changes them at the edges of rush periods.
+- The false alarm rate on clean data (36 of 1,776 hourly evaluations, mostly on weekends and the days next to them) is high enough that I would route it to a dashboard and a ticket and keep it off the on-call rotation.
 - 6-hour windows are not usable with this construction.
 
 ## Not done
