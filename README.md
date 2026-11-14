@@ -25,7 +25,7 @@ $ curl -s -X POST localhost:8000/v1/forecast -H 'Content-Type: application/json'
 {"zone":1,"origin":"2023-06-30 23:45:00","target":"2023-07-01 00:45:00","horizon_bins":4,"trips":0.136,"model_version":"dev"}
 ```
 
-The service reports 258 zones where the backtest scores 262. The ONNX parity run covers 173,376 rows (258 zones x 672 slots) against 176,064 in the backtest (262 x 672), so the service holds four fewer zones than the backtest scores. I did not trace which four or why.
+The service reports 258 zones where the backtest scores 262. The panel is built from the zones that appear in the months loaded, and the backtest loads January to June while the history snapshot and the parity run load June only. Four zones have no June pickups: 27 (Breezy Point/Fort Tilden/Riis Beach), 30 (Broad Channel), 105 (Governor's Island/Ellis Island/Liberty Island) and 176 (Oakwood). They had 6, 25, 4 and 5 pickups between January and June, the last on 10 to 30 May. The service answers a request for any of them with a 404, and the gateway's `fallback.csv` has no row for them either. The parity run covers 173,376 rows (258 zones x 672 slots) against 176,064 in the backtest (262 x 672).
 
 The gateway behaves the same way in front of this service. `scripts/gateway_integration.py` starts both, kills the model service, and records what the gateway does (`results/gateway_integration.json`): with the model up, gateway answers equal direct model answers (largest difference 0.0). With the model killed, all 40 requests came back from the fallback, 10 as `model_error` before the breaker opened and 30 as `breaker_open`. After the model restarted and the breaker's 10 s open interval passed, 20 of 20 requests were served by the model again.
 
@@ -128,7 +128,7 @@ The service runs the model as ONNX. The converter drops LightGBM's categorical s
 | Rows with absolute difference over 0.01 | 3540 of 173376 |
 <!-- /table:parity -->
 
-Aggregate accuracy is unchanged. A few rows differ by more than 2 trips because a float32-rounded feature lands on the other side of a split threshold; feeding the same rounded inputs to LightGBM directly shifts predictions by up to 2.09. The tests therefore assert aggregate and 99th-percentile bounds and do not require elementwise equality. (ADR 001.)
+Aggregate accuracy is unchanged. A few rows differ by more than 2 trips because a float32-rounded feature lands on the other side of a split threshold; feeding the same rounded inputs to LightGBM directly shifts predictions by up to 2.09. The tests therefore assert aggregate and 99th-percentile bounds and do not require elementwise equality. `scripts/check_onnx_parity.py` also exits non-zero on real data if the WAPE gap passes 0.0005, the 99th percentile passes 0.1, the maximum passes 2.5 or more than 3% of rows differ by over 0.01. Those limits sit just above the values in the table, so they catch a regression and are not an accuracy claim. (ADR 001.)
 
 ### Drift monitor
 

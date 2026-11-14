@@ -3,7 +3,10 @@ Tolerance is stated in the ADR: float32 trees are not bit-identical to float64.
 
 python scripts/check_onnx_parity.py artifacts/ data/raw 2023 6
 Arguments: directory holding model.txt and model.onnx, directory of raw parquet files, year, month.
-Scores the last seven days of that month and writes results/onnx_parity.json."""
+Scores the last seven days of that month and writes results/onnx_parity.json.
+Exits 1 if any bound below is exceeded. The bounds are regression limits set just above the
+values recorded for the shipped model, not accuracy claims: the float32 conversion legitimately
+moves a few rows by more than 2 trips (see ADR 001), so a zero-tolerance check would always fail."""
 import json
 import sys
 from pathlib import Path
@@ -44,3 +47,14 @@ report = {
 }
 Path("results/onnx_parity.json").write_text(json.dumps(report, indent=2))
 print(json.dumps(report, indent=1))
+
+BOUNDS = {  # name: (value, limit)
+    "abs WAPE gap": (abs(report["wape_lightgbm"] - report["wape_onnx"]), 0.0005),
+    "p99 abs diff": (float(np.quantile(d, 0.99)), 0.1),
+    "max abs diff": (float(d.max()), 2.5),
+    "share of rows over 0.01": (float((d > 0.01).mean()), 0.03),
+}
+failed = [f"{k}: {v:.5f} > {lim}" for k, (v, lim) in BOUNDS.items() if v > lim]
+if failed:
+    sys.exit("ONNX parity bound exceeded: " + "; ".join(failed))
+print("parity bounds hold:", ", ".join(f"{k} {v:.5f} <= {lim}" for k, (v, lim) in BOUNDS.items()))
