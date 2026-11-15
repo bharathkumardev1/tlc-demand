@@ -2,7 +2,7 @@
 
 A forecasting service for NYC taxi pickups: LightGBM predictions per pickup zone, served through a FastAPI model service and a Java gateway that falls back to a stored value when the model is slow or down.
 
-For each of the 262 TLC pickup zones, the service predicts how many yellow-taxi pickups the zone will see in the 15-minute slot that starts an hour after the latest slot we have seen (observed data ends 45 minutes before that slot starts), and it has a plan for when the model is unavailable.
+For each TLC pickup zone (262 in the backtest, 258 in the running service, explained below), the service predicts how many yellow-taxi pickups the zone will see in the 15-minute slot that starts an hour after the latest slot we have seen (observed data ends 45 minutes before that slot starts), and it has a plan for when the model is unavailable.
 
 The model is a Poisson LightGBM on leakage-checked features (recent counts, rolling means, the same slot a day and a week earlier, calendar fields), scored with a rolling-origin backtest against three simple baselines, exported to ONNX, and served behind a Spring Boot gateway with a timeout and a circuit breaker.
 
