@@ -8,7 +8,7 @@ The model is a Poisson LightGBM on leakage-checked features (recent counts, roll
 
 Over three test weeks in June 2023 (one-hour horizon, all zones), the model has a WAPE of 0.2415. The strongest of the three baselines is the same slot one week earlier at 0.3104, so the model's error is 22% lower. Repeating the latest count scores 0.3476 and the same slot yesterday 0.3716. In the half of zones with the lowest volume the model loses to every baseline; those zones carry 0.28% of trips.
 
-There is no hosted demo. After installing, two commands bring the service up locally (see "Run it") and a real session is shown below.
+After installing, two commands bring the service up locally (see "Run it"), and a real session is shown below.
 
 ### Example session
 
@@ -214,7 +214,6 @@ For the 2020 check, run `scripts/fetch_tlc.sh data/raw2020 2020 1 6` first. To c
 - **Not in this repo.** No container image, orchestration, warehouse, experiment tracker or model registry. The model artifact is a file produced by `export_model.py`.
 - **CI covers lint, the Python tests and the gateway tests only.** Ruff checks for syntax errors, undefined or unused names and import-time problems (E4, E7, E9, F), not style. It runs on GitHub on every push, and the Actions tab shows the current status. One earlier run, run 4 (commit 97e621d), failed in the gateway job at `GatewayTest.servesTheModelWhenItIsHealthy`, which expected the model and got the seasonal-naive fallback and I read that as the first model call exceeding the 150 ms timeout on a cold runner, which I did not confirm. That test now uses a longer timeout and the slow-model test has its own class (057f99e). The workflow still runs the Python tests on 3.12 only. CI does not run the backtest or any script that needs the TLC data.
 - **Service load numbers are synthetic and from a 2 vCPU container, gateway not measured.** Forecast service, random zones, load generator on the same two CPUs (`results/loadtest.json`, three runs of 3,000 requests each; about 3% of the random zones have no history and get a 404, which the generator counts as answered): one request at a time, p50 2.4 ms, p95 3.3 to 3.4 ms, p99 5.7 to 6.1 ms, about 381 to 390 requests per second; four concurrent clients, p50 8.5 to 9.3 ms, p95 14.4 to 15.4 ms, p99 17.7 to 20.1 ms, about 404 to 442 requests per second. Throughput barely rises from one client to four because the two CPUs are shared with the load generator, so treat it as a floor. The Spring Boot gateway has no timing.
-- **No hosted demo.**
 
 ## Data and licence
 
